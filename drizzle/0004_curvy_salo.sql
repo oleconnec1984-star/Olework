@@ -1,0 +1,1 @@
+ALTER TABLE `ole_employee_accounts` ADD `visible_departments` text DEFAULT '[]' NOT NULL;

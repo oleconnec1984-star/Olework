@@ -1,0 +1,2 @@
+import {env} from 'cloudflare:workers';import {clearSessionCookie,destroySession,sameOrigin} from '../../../../lib/employee-auth';
+export const dynamic='force-dynamic';export async function POST(request:Request){if(!sameOrigin(request))return Response.json({error:'คำขอไม่ถูกต้อง'},{status:403});await destroySession(env.DB,request);return Response.json({ok:true},{headers:{'Set-Cookie':clearSessionCookie(request),'Cache-Control':'no-store'}})}
