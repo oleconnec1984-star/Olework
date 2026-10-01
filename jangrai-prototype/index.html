@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>จังไรออนไลน์ - Stage 1 Prototype</title>
+<style>
+html,body{margin:0;height:100%;background:#10131a;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+#game{width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;max-width:100%;max-height:100%}
+#controls{position:fixed;inset:auto 0 12px 0;display:flex;justify-content:space-between;align-items:end;padding:0 14px;z-index:20;pointer-events:none}
+.pad,.actions{display:flex;gap:10px;pointer-events:auto}
+button{width:62px;height:62px;border-radius:18px;border:2px solid rgba(255,255,255,.25);background:rgba(15,18,25,.72);color:#fff;font-size:24px;font-weight:800;backdrop-filter:blur(7px);touch-action:none}
+button:active,.on{transform:scale(.94);background:rgba(255,255,255,.25)}
+.small{font-size:14px;line-height:1.05}
+#top{position:fixed;top:8px;right:10px;z-index:30}
+#top button{width:auto;height:38px;padding:0 12px;border-radius:12px;font-size:13px}
+@media (min-width:900px){#controls{opacity:.45}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="top"><button id="restart">RESTART</button></div>
+<div id="controls">
+  <div class="pad">
+    <button id="left">◀</button>
+    <button id="right">▶</button>
+    <button id="jump">▲</button>
+  </div>
+  <div class="actions">
+    <button id="shoot" class="small">ยิง<br>J</button>
+    <button id="melee" class="small">ตี<br>K</button>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+<script>
+const W=960,H=540;
+let player,enemy,ground,bullets,hpText,ehpText,stateText,muzzle;
+let cursors,keyA,keyD,keyW,keyJ,keyK,keyR;
+let pHP=100,eHP=100,facing=1,shootAt=0,meleeAt=0,enemyHitAt=0,over=false;
+const touch={left:false,right:false,jump:false,shoot:false,melee:false};
+
+new Phaser.Game({
+  type:Phaser.AUTO,parent:'game',width:W,height:H,backgroundColor:'#1b2130',pixelArt:true,
+  scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},
+  physics:{default:'arcade',arcade:{gravity:{y:1100},debug:false}},
+  scene:{create,update}
+});
+
+function create(){
+  makeTextures.call(this);
+  this.add.rectangle(W/2,H/2,W,H,0x1b2130);
+  this.add.rectangle(W/2,410,W,130,0x29313f);
+  this.add.rectangle(760,250,130,210,0x343b47);
+  this.add.rectangle(155,298,210,16,0x4f5969);
+  this.add.text(24,22,'จังไรออนไลน์ — STAGE 1',{fontFamily:'monospace',fontSize:'22px',color:'#fff'}).setDepth(10);
+
+  ground=this.physics.add.staticGroup();
+  ground.create(W/2,505,'ground').setScale(15,1).refreshBody();
+  ground.create(155,298,'platform').setScale(3.2,1).refreshBody();
+
+  player=this.physics.add.sprite(120,430,'hero').setCollideWorldBounds(true);
+  player.body.setSize(28,52).setOffset(10,8);
+  enemy=this.physics.add.sprite(740,430,'enemy').setCollideWorldBounds(true);
+  enemy.body.setSize(30,50).setOffset(9,10);
+  enemy.setVelocityX(-65);
+
+  bullets=this.physics.add.group({classType:Phaser.Physics.Arcade.Image,maxSize:24});
+  muzzle=this.add.sprite(-100,-100,'muzzle').setDepth(6).setVisible(false);
+
+  this.physics.add.collider(player,ground);
+  this.physics.add.collider(enemy,ground);
+  this.physics.add.collider(bullets,ground,b=>b.destroy());
+  this.physics.add.overlap(bullets,enemy,onBulletHit,null,this);
+  this.physics.add.overlap(player,enemy,onTouch,null,this);
+
+  cursors=this.input.keyboard.createCursorKeys();
+  keyA=this.input.keyboard.addKey('A'); keyD=this.input.keyboard.addKey('D'); keyW=this.input.keyboard.addKey('W');
+  keyJ=this.input.keyboard.addKey('J'); keyK=this.input.keyboard.addKey('K'); keyR=this.input.keyboard.addKey('R');
+
+  hpText=this.add.text(24,58,'',{fontFamily:'monospace',fontSize:'18px',color:'#8dff9d'}).setDepth(10);
+  ehpText=this.add.text(680,58,'',{fontFamily:'monospace',fontSize:'18px',color:'#ff9696'}).setDepth(10);
+  stateText=this.add.text(W/2,95,'',{fontFamily:'monospace',fontSize:'26px',color:'#fff',align:'center'}).setOrigin(.5).setDepth(10);
+  hud();
+}
+
+function update(time){
+  if(Phaser.Input.Keyboard.JustDown(keyR)) reset.call(this);
+  if(over){player.setVelocityX(0);return;}
+
+  const L=keyA.isDown||cursors.left.isDown||touch.left;
+  const R=keyD.isDown||cursors.right.isDown||touch.right;
+  if(L){player.setVelocityX(-235);facing=-1;player.setFlipX(true)}
+  else if(R){player.setVelocityX(235);facing=1;player.setFlipX(false)}
+  else player.setVelocityX(0);
+
+  if((Phaser.Input.Keyboard.JustDown(cursors.up)||Phaser.Input.Keyboard.JustDown(cursors.space)||Phaser.Input.Keyboard.JustDown(keyW)||touch.jump)&&player.body.blocked.down){
+    player.setVelocityY(-510); touch.jump=false;
+  }
+  if((Phaser.Input.Keyboard.JustDown(keyJ)||touch.shoot)&&time>=shootAt){fire.call(this,time);touch.shoot=false;}
+  if((Phaser.Input.Keyboard.JustDown(keyK)||touch.melee)&&time>=meleeAt){melee.call(this,time);touch.melee=false;}
+
+  if(enemy.active){
+    const dx=player.x-enemy.x;
+    if(Math.abs(dx)<330){enemy.setVelocityX(Math.sign(dx)*82);enemy.setFlipX(dx<0);}
+  }
+}
+
+function fire(time){
+  shootAt=time+260;
+  const b=bullets.get(player.x+facing*28,player.y-8,'bullet'); if(!b)return;
+  b.enableBody(true,player.x+facing*28,player.y-8,true,true); b.body.allowGravity=false; b.setVelocityX(facing*540); b.setData('dmg',20);
+  muzzle.setPosition(player.x+facing*30,player.y-8).setFlipX(facing<0).setVisible(true);
+  this.time.delayedCall(65,()=>muzzle.setVisible(false));
+  this.time.delayedCall(1300,()=>{if(b.active)b.destroy()});
+}
+function melee(time){
+  meleeAt=time+430;
+  const s=this.add.sprite(player.x+facing*38,player.y,'slash').setFlipX(facing<0).setDepth(7);
+  this.tweens.add({targets:s,alpha:0,scale:1.4,duration:120,onComplete:()=>s.destroy()});
+  if(enemy.active&&Phaser.Math.Distance.Between(player.x,player.y,enemy.x,enemy.y)<82) damageEnemy.call(this,35,facing*170);
+}
+function onBulletHit(b,e){const dir=Math.sign(b.body.velocity.x)||1;b.destroy();damageEnemy.call(this,20,dir*110)}
+function damageEnemy(amount,kb){
+  if(!enemy.active)return;
+  eHP=Math.max(0,eHP-amount); enemy.setTintFill(0xffffff); enemy.setVelocityX(kb);
+  this.time.delayedCall(80,()=>{if(enemy.active)enemy.clearTint()});
+  hitfx.call(this,enemy.x,enemy.y-10); hud();
+  if(eHP<=0){enemy.disableBody(true,true);stateText.setText('ENEMY DOWN!\nกด RESTART เพื่อเริ่มใหม่');over=true;}
+}
+function onTouch(p,e){
+  if(over||!e.active||this.time.now<enemyHitAt)return;
+  enemyHitAt=this.time.now+850; pHP=Math.max(0,pHP-15);
+  const dir=Math.sign(player.x-enemy.x)||1;player.setVelocity(dir*240,-220);player.setTintFill(0xffffff);
+  this.time.delayedCall(90,()=>player.clearTint());hud();
+  if(pHP<=0){player.setTint(0x555555);stateText.setText('YOU DIED\nกด RESTART เพื่อเริ่มใหม่');over=true;}
+}
+function hitfx(x,y){const fx=this.add.sprite(x,y,'hit').setDepth(8);this.tweens.add({targets:fx,alpha:0,angle:45,scale:1.5,duration:150,onComplete:()=>fx.destroy()})}
+function hud(){hpText.setText('PLAYER HP  '+pHP+'/100');ehpText.setText('ENEMY HP  '+eHP+'/100')}
+function reset(){pHP=100;eHP=100;facing=1;shootAt=0;meleeAt=0;enemyHitAt=0;over=false;this.scene.restart();}
+
+function makeTextures(){
+  const g=this.add.graphics();
+  g.fillStyle(0xf2c94c).fillRect(12,5,24,16);g.fillStyle(0x111111).fillRect(17,10,4,4).fillRect(29,10,4,4);g.fillStyle(0x2f80ed).fillRect(9,21,30,30);g.fillStyle(0x111111).fillRect(12,51,10,12).fillRect(28,51,10,12);g.generateTexture('hero',48,64);g.clear();
+  g.fillStyle(0xe76f51).fillRect(12,5,24,16);g.fillStyle(0x111111).fillRect(17,10,4,4).fillRect(29,10,4,4);g.fillStyle(0x6d2330).fillRect(9,21,30,30);g.fillStyle(0x111111).fillRect(12,51,10,12).fillRect(28,51,10,12);g.generateTexture('enemy',48,64);g.clear();
+  g.fillStyle(0xffffff).fillRect(0,0,14,5);g.generateTexture('bullet',14,5);g.clear();
+  g.fillStyle(0xffd166).fillTriangle(0,9,18,0,18,18);g.generateTexture('muzzle',18,18);g.clear();
+  g.lineStyle(6,0xfafafa,1);g.beginPath();g.arc(22,22,18,-1,1);g.strokePath();g.generateTexture('slash',44,44);g.clear();
+  g.fillStyle(0xffffff).fillTriangle(16,0,20,12,32,6).fillTriangle(32,16,20,20,26,32).fillTriangle(16,32,12,20,0,26).fillTriangle(0,16,12,12,6,0);g.generateTexture('hit',32,32);g.clear();
+  g.fillStyle(0x4b5563).fillRect(0,0,64,32);g.generateTexture('ground',64,32);g.clear();
+  g.fillStyle(0x657184).fillRect(0,0,64,16);g.generateTexture('platform',64,16);g.destroy();
+}
+
+function bindHold(id,key){
+  const el=document.getElementById(id);
+  ['pointerdown','touchstart'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();touch[key]=true;el.classList.add('on')},{passive:false}));
+  ['pointerup','pointercancel','pointerleave','touchend'].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();touch[key]=false;el.classList.remove('on')},{passive:false}));
+}
+bindHold('left','left');bindHold('right','right');
+['jump','shoot','melee'].forEach(k=>document.getElementById(k).addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true;setTimeout(()=>touch[k]=false,60)}));
+document.getElementById('restart').addEventListener('click',()=>location.reload());
+</script>
+</body>
+</html>
