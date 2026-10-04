@@ -86,10 +86,10 @@ function frames(obj,act){return MAP[obj.kind]?.[act]||MAP[obj.kind]?.idle||[]}
 const KIND_META={phee:{scale:2.18,foot:9},soja:{scale:2.14,foot:9},em:{scale:2.08,foot:9},wairoon:{scale:2.08,foot:9},enemy:{scale:2.04,foot:9}};
 const ACTION_META={idle:{fps:5,loop:true},run:{fps:10,loop:true},jump:{fps:0,loop:false},shoot:{fps:14,loop:false},melee:{fps:12,loop:false},hit:{fps:10,loop:false},death:{fps:8,loop:false},attack:{fps:11,loop:false}};
 const MELEE_META={
- phee:{row:0,count:5,dur:.46,hit:.20,scale:1.07,anchorX:96,anchorY:140,lunge:46},
- soja:{row:1,count:5,dur:.48,hit:.22,scale:1.10,anchorX:92,anchorY:140,lunge:34},
- em:{row:2,count:6,dur:.54,hit:.25,scale:1.03,anchorX:104,anchorY:140,lunge:42},
- wairoon:{row:3,count:5,dur:.44,hit:.18,scale:1.08,anchorX:100,anchorY:140,lunge:56}
+ phee:{row:0,count:5,dur:.52,hit:.19,scale:1.16,anchorX:100,anchorY:139,times:[0,.15,.30,.50,.72,1],offs:[[0,0],[0,0],[1,0],[0,0],[0,0]]},
+ soja:{row:1,count:5,dur:.54,hit:.21,scale:1.25,anchorX:96,anchorY:139,times:[0,.16,.32,.52,.74,1],offs:[[0,0],[-2,0],[-1,0],[0,0],[1,0]]},
+ em:{row:2,count:6,dur:.58,hit:.25,scale:1.14,anchorX:106,anchorY:135,times:[0,.13,.26,.42,.58,.76,1],offs:[[0,0],[0,0],[1,0],[2,0],[1,0],[0,0]]},
+ wairoon:{row:3,count:5,dur:.50,hit:.18,scale:1.11,anchorX:101,anchorY:136,times:[0,.14,.28,.48,.70,1],offs:[[0,0],[0,0],[1,0],[1,0],[0,0]]}
 };
 const ACTION_VIS={idle:{crop:[4,2,56,60],x:0,y:0,scale:1},run:{crop:[4,2,56,60],x:0,y:0,scale:1},jump:{crop:[4,2,56,60],x:0,y:-3,scale:1},shoot:{crop:[3,2,58,60],x:2,y:0,scale:1},melee:{crop:[2,2,60,60],x:10,y:0,scale:1.03},hit:{crop:[4,2,56,60],x:0,y:0,scale:1},death:{crop:[2,2,60,60],x:0,y:1,scale:1},attack:{crop:[2,2,60,60],x:4,y:0,scale:1}};
 function setState(o,s,d=0){
@@ -112,13 +112,15 @@ function frameOf(o){
 function drawMeleeSprite(o){
  const meta=MELEE_META[o.kind]; if(!meta)return false;
  const p=Math.max(0,Math.min(.9999,o.animT/meta.dur));
- const idx=Math.min(meta.count-1,Math.floor(p*meta.count));
+ let idx=meta.count-1;
+ for(let i=0;i<meta.count;i++){ if(p>=meta.times[i] && p<meta.times[i+1]){idx=i;break;} }
  const sx=idx*256,sy=meta.row*144,s=meta.scale;
  const dw=256*s,dh=144*s;
  const cx=o.x-cam+o.w/2;
- const dy=o.y+o.h-meta.anchorY*s+9;
+ const off=meta.offs[idx]||[0,0];
+ const dy=o.y+o.h-meta.anchorY*s+9+off[1];
  X.save();
- X.translate(cx,0);
+ X.translate(cx+off[0]*o.face,0);
  X.scale(o.face<0?-1:1,1);
  X.globalAlpha=o.inv>0&&Math.floor(o.inv*18)%2?0.35:1;
  X.drawImage(MELEE_ATLAS,sx,sy,256,144,-meta.anchorX*s,dy,dw,dh);
@@ -165,7 +167,7 @@ function melee(){
  const meta=MELEE_META[player.kind]||MELEE_META.phee;
  setState(player,'melee',meta.dur);
  player.attackHitAt=meta.hit;
- player.vx=player.face*meta.lunge;
+ player.vx*=.18;
 }
 function update(dt){
  if(!started)return;
@@ -187,7 +189,7 @@ function update(dt){
      }
    }else{
      // During attacks keep the feet planted; only preserve a small lunge.
-     player.vx *= player.state==='melee' ? .82 : .72;
+     player.vx *= player.state==='melee' ? .45 : .72;
    }
    if((touch.jump||key.jumpPulse)&&player.onGround&&!locked){
      player.vy=-520;player.onGround=false;setState(player,'jump');
@@ -303,7 +305,7 @@ function draw(){
  for(const f of fx){const sx=f.x-cam;if(f.type==='hit'){X.strokeStyle='#fff';X.lineWidth=4;X.beginPath();X.moveTo(sx-12,f.y-12);X.lineTo(sx+12,f.y+12);X.moveTo(sx+12,f.y-12);X.lineTo(sx-12,f.y+12);X.stroke()}else{X.fillStyle='#ffd34e';X.beginPath();X.moveTo(sx,f.y);X.lineTo(sx-f.face*18,f.y-9);X.lineTo(sx-f.face*18,f.y+9);X.fill()}}
  bar(18,18,230,player.hp,player.maxHp,'#34d16a',NAMES[player.kind]);
  X.fillStyle='#fff';X.font='bold 15px system-ui';X.fillText('🪙 '+coins+'   ☠ '+kills,18,62);
- X.fillStyle='#f9cb3b';X.font='900 20px system-ui';X.textAlign='center';X.fillText('JANGRAI ONLINE • STAGE 1 • ด่านตรวจนครป่วน',W/2,32);X.textAlign='left';
+ X.fillStyle='#f9cb3b';X.font='900 20px system-ui';X.textAlign='center';X.fillText('JANGRAI ONLINE • STAGE 1 • MELEE TUNED',W/2,32);X.textAlign='left';
  for(const e of enemies)if(!e.dead&&Math.abs(e.x-player.x)<350){bar(e.x-cam-20,e.y-22,90,e.hp,e.maxHp,'#ef4545','');}
  if(player.dead){X.fillStyle='#0009';X.fillRect(0,0,W,H);X.fillStyle='#fff';X.textAlign='center';X.font='900 42px monospace';X.fillText('YOU DIED',W/2,230);X.font='18px system-ui';X.fillText('กด RESTART เพื่อเอาคืน',W/2,270);X.textAlign='left'}
  if(kills===enemies.length&&!player.dead){X.fillStyle='#0008';X.fillRect(0,0,W,H);X.fillStyle='#ffd43b';X.textAlign='center';X.font='900 38px system-ui';X.fillText('เคลียร์ด่านทดลองแล้ว!',W/2,230);X.fillStyle='#fff';X.font='18px system-ui';X.fillText('โมชั่นตัวละคร + ศัตรู ใช้ Sprite Sheet ที่ล็อกไว้',W/2,270);X.textAlign='left'}
