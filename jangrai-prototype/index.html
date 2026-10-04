@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>จังไรออนไลน์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,700;0,900;1,900&family=Press+Start+2P&display=swap">
 <style>
 :root{--ui:rgba(10,12,18,.78);--line:rgba(255,255,255,.22);}
 *{box-sizing:border-box}
@@ -22,25 +23,67 @@ html,body{margin:0;height:100%;background:#07090d;color:#fff;font-family:system-
 #ult.ready{border-color:#ffd43b;box-shadow:0 0 18px #ffb43d99}
 #topbar{position:fixed;right:10px;top:max(10px,env(safe-area-inset-top));z-index:25;display:flex;gap:7px}
 #topbar button{height:36px;border-radius:12px;border:1px solid var(--line);background:#0c0f16dd;color:#fff;font-weight:800;padding:0 12px}
-#select{position:fixed;inset:0;background:radial-gradient(circle at 50% 20%,#301548,#090b12 65%);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
-.panel{width:min(920px,96vw);border:2px solid #ffffff2e;border-radius:22px;background:#0d1018ee;box-shadow:0 24px 80px #000;padding:18px}
-.logo{font-size:clamp(28px,6vw,62px);font-weight:1000;letter-spacing:-2px;text-align:center;background:linear-gradient(#ffd227,#ff6d00,#ff2365);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{text-align:center;opacity:.78;margin-top:-4px;margin-bottom:14px;font-weight:700}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.card{border:2px solid #ffffff20;border-radius:16px;background:#141926;padding:8px;cursor:pointer;text-align:center;min-width:0}
-.card.selected{border-color:#ffd43b;box-shadow:0 0 0 2px #ffd43b22,0 0 24px #ffd43b35}
-.card canvas{width:100%;max-width:130px;aspect-ratio:1;image-rendering:pixelated}
-.card b{display:block;font-size:16px}
-.card small{opacity:.63;display:block}
-.card i{font-style:normal;font-size:11px;color:#7fdcff;display:block;margin-top:3px}
-#start{margin:16px auto 0;display:block;border:0;border-radius:15px;background:linear-gradient(180deg,#ffd43b,#ff8c00);color:#15100a;font-weight:1000;font-size:20px;padding:13px 34px;box-shadow:0 8px 28px #ff970044;cursor:pointer}
+/* ===== CHARACTER SELECT (อาร์เคดยุค 90) ===== */
+#select{--c:#7bd34a;position:fixed;inset:0;z-index:60;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;background:#07060d;font-family:'Kanit',system-ui,sans-serif;color:#fff}
+#select::before{content:'';position:absolute;inset:-50%;background:repeating-linear-gradient(115deg,color-mix(in srgb,var(--c) 22%,transparent) 0 26px,transparent 26px 70px);animation:selStripe 6s linear infinite;opacity:.55;transition:background .3s}
+#select::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 2px,#0006 2px 3px),radial-gradient(ellipse at 35% 55%,#0000 30%,#000c 85%)}
+@keyframes selStripe{to{transform:translate(140px,0)}}
+#select>*{position:relative;z-index:1}
+.sel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:max(10px,env(safe-area-inset-top)) clamp(14px,3vw,34px) 0}
+.sel-logo{font-weight:900;font-size:clamp(20px,3.6vw,38px);letter-spacing:-1px;background:linear-gradient(#ffe14a,#ff7a00 60%,#ff2d6a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #000)}
+.sel-title{font-family:'Press Start 2P',monospace;font-size:clamp(9px,1.4vw,15px);color:#fff;text-shadow:3px 3px 0 #000;animation:selBlink 1.1s steps(2) infinite}
+@keyframes selBlink{50%{color:var(--c)}}
+#selMute{font-family:'Press Start 2P',monospace;font-size:10px;background:#000a;color:#fff;border:2px solid #fff4;border-radius:8px;padding:8px 10px;cursor:pointer}
+.sel-stage{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:center;min-height:0;padding:0 clamp(14px,3vw,34px)}
+.sel-hero{position:relative;height:100%;min-height:0;display:flex;align-items:flex-end;justify-content:center}
+.sel-bgname{position:absolute;left:0;right:0;top:8%;text-align:center;font-weight:900;font-size:clamp(60px,13vw,170px);line-height:.9;color:transparent;-webkit-text-stroke:2px color-mix(in srgb,var(--c) 55%,transparent);opacity:.5;white-space:nowrap;overflow:hidden;font-style:italic}
+.sel-hero::before{content:'';position:absolute;bottom:4%;left:50%;width:min(70%,420px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c) 55%,transparent),transparent 65%);filter:blur(4px)}
+#selBig{position:relative;height:min(100%,62vh);aspect-ratio:7/6;max-width:100%;image-rendering:pixelated}
+.sel-info{display:flex;flex-direction:column;gap:clamp(4px,1.2vh,12px);min-width:0}
+.sel-p1{font-family:'Press Start 2P',monospace;font-size:11px;color:#111;background:var(--c);align-self:flex-start;padding:5px 8px;box-shadow:3px 3px 0 #000}
+#selName{font-weight:900;font-size:clamp(32px,6.4vw,78px);line-height:.95;text-shadow:4px 4px 0 #000,0 0 26px color-mix(in srgb,var(--c) 60%,transparent);font-style:italic}
+#selTag{font-size:clamp(13px,1.8vw,20px);color:var(--c);font-weight:700}
+#selQuote{font-size:clamp(12px,1.5vw,17px);opacity:.85;border-left:4px solid var(--c);padding-left:10px}
+.sel-stats{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:center;font-family:'Press Start 2P',monospace;font-size:clamp(8px,1vw,11px)}
+.sel-bar{display:flex;gap:3px}
+.sel-bar i{display:block;height:clamp(8px,1.4vh,12px);flex:1;background:#fff2;transform:skewX(-20deg)}
+.sel-bar i.on{background:var(--c);box-shadow:0 0 8px var(--c)}
+.sel-skill{font-size:clamp(11px,1.4vw,15px);display:grid;gap:2px}
+.sel-skill b{color:var(--c)}
+.sel-foot{display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,2vw,22px);padding:0 14px max(10px,env(safe-area-inset-bottom));flex-wrap:wrap}
+.sel-tiles{display:flex;gap:clamp(6px,1.2vw,12px)}
+.sel-tile{position:relative;width:clamp(58px,9vw,104px);aspect-ratio:1;padding:0;border:3px solid #fff3;background:#000c;cursor:pointer;transform:skewX(-6deg);transition:transform .12s,border-color .12s}
+.sel-tile canvas{width:100%;height:100%;display:block;image-rendering:pixelated;filter:grayscale(.6) brightness(.7);transition:filter .12s}
+.sel-tile.on{border-color:var(--c);transform:skewX(-6deg) translateY(-6px) scale(1.06);box-shadow:0 0 0 2px #000,0 0 22px var(--c)}
+.sel-tile.on canvas{filter:none}
+.sel-tile.on::after{content:'1P';position:absolute;top:-14px;left:50%;transform:translateX(-50%) skewX(6deg);font-family:'Press Start 2P',monospace;font-size:9px;background:#ff2d4a;color:#fff;padding:3px 5px;animation:selBlink 0.6s steps(2) infinite}
+.sel-tile:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#start{font-family:'Press Start 2P',monospace;font-size:clamp(11px,1.5vw,16px);border:0;padding:16px 22px;background:linear-gradient(#ffe14a,#ff8a00);color:#1a0d00;box-shadow:4px 4px 0 #000,0 0 26px #ff8a0088;cursor:pointer;transform:skewX(-6deg)}
 #start:disabled{opacity:.5;cursor:wait}
-.note{text-align:center;opacity:.62;font-size:12px;margin-top:8px;line-height:1.6}
+#start:not(:disabled){animation:selPulse 1s ease-in-out infinite}
+@keyframes selPulse{50%{box-shadow:4px 4px 0 #000,0 0 40px #ffb000}}
+.sel-help{width:100%;text-align:center;font-size:11px;opacity:.55}
+/* confirm sequence */
+#selFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:5}
+#selBand{position:absolute;left:-10%;right:-10%;top:42%;height:0;background:var(--c);transform:skewY(-6deg);z-index:4;display:none;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 6px #000}
+#selBand span{font-family:'Press Start 2P',monospace;font-size:clamp(20px,4.5vw,52px);color:#000;white-space:nowrap;text-shadow:3px 3px 0 #fff8}
+#select.go #selFlash{animation:selFlash .5s ease-out}
+#select.go #selBand{display:flex;animation:selBand 1.3s cubic-bezier(.2,.9,.2,1) forwards}
+#select.go #selBand span{animation:selSlide 1.3s cubic-bezier(.2,.9,.2,1) forwards}
+#select.go{animation:selShake .35s .05s}
+#select.out{animation:selOut .35s ease-in forwards}
+@keyframes selFlash{0%{opacity:.95}100%{opacity:0}}
+@keyframes selBand{0%{height:0}18%{height:clamp(60px,15vh,130px)}82%{height:clamp(60px,15vh,130px)}100%{height:clamp(60px,15vh,130px)}}
+@keyframes selSlide{0%{transform:translateX(120%)}25%{transform:translateX(0)}80%{transform:translateX(-4%)}100%{transform:translateX(-4%)}}
+@keyframes selShake{20%{transform:translate(-8px,4px)}40%{transform:translate(7px,-5px)}60%{transform:translate(-5px,3px)}80%{transform:translate(3px,-2px)}}
+@keyframes selOut{to{opacity:0;transform:scale(1.08)}}
+@media (max-height:430px){.sel-help{display:none}.sel-quote-hide{display:none}#selQuote{display:none}}
+@media (max-width:640px){.sel-stage{grid-template-columns:1fr}.sel-hero{display:none}}
+@media (prefers-reduced-motion:reduce){#select::before,#select.go,#select.go #selBand span{animation:none}}
 #err{display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:99;background:#7a1020;padding:10px 16px;border-radius:12px;font-weight:700}
 #rotate{display:none;position:fixed;inset:0;z-index:90;background:#080a10ef;align-items:center;justify-content:center;text-align:center;font-size:18px;font-weight:800;padding:28px}
 @media(max-width:720px) and (orientation:portrait){#rotate{display:flex}}
 @media(hover:hover) and (pointer:fine){#controls{opacity:.55}}
-@media(max-width:560px){.cards{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -51,19 +94,27 @@ html,body{margin:0;height:100%;background:#07090d;color:#fff;font-family:system-
  <div class="group"><button class="ctrl action" data-key="shoot">ยิง<br>J</button><button class="ctrl action" data-key="melee">ตี<br>K</button><button class="ctrl action" id="skill" data-key="skill">SKILL<br>L</button><button class="ctrl action" id="ult" data-key="ult">ULT<br>I</button></div>
 </div>
 <div id="select">
- <div class="panel">
-  <div class="logo">จังไรออนไลน์</div>
-  <div class="sub">STAGE 1 • เลือกตัวละคร</div>
-  <div class="cards">
-   <div class="card selected" data-char="phee"><canvas width="128" height="128"></canvas><b>พี่ขอ</b><small>ของทิ้งคือกระสุน</small><i>สกิล: ขว้างชามระเบิด</i></div>
-   <div class="card" data-char="soja"><canvas width="128" height="128"></canvas><b>ซ้อจ๋า</b><small>ซ้อเคลียร์ให้</small><i>สกิล: หัวใจสามดอก</i></div>
-   <div class="card" data-char="em"><canvas width="128" height="128"></canvas><b>เอ็มตัวลาย</b><small>สายบวกเต็มระบบ</small><i>สกิล: โซ่ฟาดกวาด</i></div>
-   <div class="card" data-char="wairoon"><canvas width="128" height="128"></canvas><b>วัยรุ่นตัวลาย</b><small>ไวจัด • ฟาดไว</small><i>สกิล: พุ่งชนทะลุ</i></div>
+ <div class="sel-head"><div class="sel-logo">จังไรออนไลน์</div><div class="sel-title">SELECT YOUR FIGHTER</div><button id="selMute" type="button">♪ ON</button></div>
+ <div class="sel-stage">
+  <div class="sel-hero"><div class="sel-bgname" id="selBgName"></div><canvas id="selBig" width="420" height="360"></canvas></div>
+  <div class="sel-info">
+   <div class="sel-p1">PLAYER 1</div>
+   <div id="selName"></div>
+   <div id="selTag"></div>
+   <div id="selQuote"></div>
+   <div class="sel-stats"><span>POW</span><div class="sel-bar" id="stPow"></div><span>SPD</span><div class="sel-bar" id="stSpd"></div><span>RNG</span><div class="sel-bar" id="stRng"></div></div>
+   <div class="sel-skill"><div>SKILL <b id="selSkill"></b></div><div>ULT <b>ระเบิดสามลูก</b></div></div>
   </div>
-  <button id="start" disabled>กำลังโหลด…</button>
-  <div class="note">คีย์บอร์ด: ← → / A D เดิน • Space / ↑ กระโดด • J ยิง • K ตี • L สกิล • I อัลติ • 1–4 เปลี่ยนตัว • R เริ่มใหม่<br>มือถือ: หมุนแนวนอน แล้วใช้ปุ่มบนจอ</div>
  </div>
+ <div class="sel-foot">
+  <div class="sel-tiles" id="selTiles"></div>
+  <button id="start" type="button" disabled>LOADING…</button>
+  <div class="sel-help">← → เลือก • Enter ยืนยัน • มือถือ: แตะรูปแล้วกดยืนยัน (หมุนจอแนวนอน)</div>
+ </div>
+ <div id="selBand"><span id="selBandTxt">READY? FIGHT!</span></div>
+ <div id="selFlash"></div>
 </div>
+
 <div id="err"></div>
 <div id="rotate">📱↔️<br><br>หมุนมือถือเป็นแนวนอนก่อน<br>เกมจะได้เต็มจอแบบคนไม่ทรมานสายตา 😂</div>
 
@@ -146,16 +197,99 @@ class RetroSfx{
 const SFX=new RetroSfx();
 
 let chosen='phee',game=null;
-function drawCards(){
- document.querySelectorAll('.card').forEach(card=>{
-  const k=card.dataset.char,m=MAP[k],f=m.acts.idle[0],ct=card.querySelector('canvas').getContext('2d');
-  const s=112/m.ch,w=m.cw*s;ct.imageSmoothingEnabled=true;ct.imageSmoothingQuality='high';ct.clearRect(0,0,128,128);
-  ct.drawImage(IMG[k],f[0],f[1],m.cw,m.ch,64-w/2,128-m.ch*s-4,w,m.ch*s);
- });
-}
-document.querySelectorAll('.card').forEach(card=>card.addEventListener('click',()=>{
- chosen=card.dataset.char;document.querySelectorAll('.card').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');
-}));
+/* ===== CHARACTER SELECT ===== */
+const ROSTER={
+ phee:{name:'พี่ขอ',tag:'ของทิ้งคือกระสุน',quote:'“ของที่คนอื่นทิ้ง พี่เก็บมาเป็นอาวุธหมด”',skill:'ขว้างชามระเบิด',c:'#7bd34a',st:[4,2,4]},
+ soja:{name:'ซ้อจ๋า',tag:'ซ้อเคลียร์ให้',quote:'“ใจเย็นๆ เดี๋ยวซ้อเคลียร์เอง”',skill:'หัวใจสามดอก',c:'#ff4fa8',st:[3,3,5]},
+ em:{name:'เอ็มตัวลาย',tag:'สายบวกเต็มระบบ',quote:'“เจอหน้าก็บวก ไม่มีคำว่าถอย”',skill:'โซ่ฟาดกวาด',c:'#3fa8ff',st:[5,3,3]},
+ wairoon:{name:'วัยรุ่นตัวลาย',tag:'ไวจัด • ฟาดไว',quote:'“ไวกว่านี้ก็เป็นลมแล้วพี่”',skill:'พุ่งชนทะลุ',c:'#ffd23b',st:[3,5,2]}
+};
+/* เพลงชิปทูน + เสียงเมนู (สร้างสดด้วย WebAudio ไม่ใช้ไฟล์เสียง) */
+const SelAudio={
+ on:true,playing:false,step:0,next:0,timer:null,
+ ctx(){SFX.init();return SFX.ctx},
+ note(f,t,d,type,v){const c=this.ctx();if(!c||!this.on)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)},
+ hat(t,v=.05){const c=this.ctx();if(!c||!this.on)return;const n=Math.floor(c.sampleRate*.03),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const s=c.createBufferSource(),g=c.createGain();s.buffer=b;g.gain.value=v;s.connect(g);g.connect(c.destination);s.start(t)},
+ hz(m){return 440*Math.pow(2,(m-69)/12)},
+ start(){const c=this.ctx();if(!c||this.playing||!this.on)return;this.playing=true;this.next=c.currentTime+.06;this.tick()},
+ stop(){this.playing=false;clearTimeout(this.timer)},
+ tick(){
+  if(!this.playing)return;const c=this.ctx(),spb=60/148/2;            // โน้ตเขบ็ตหนึ่งชั้น ที่ 148 BPM
+  const roots=[57,53,48,55],arp=[0,7,12,7,3,7,12,15];                   // Am F C G
+  while(this.next<c.currentTime+.12){
+   const s=this.step,bar=Math.floor(s/16)%4,r=roots[bar],t=this.next;
+   this.note(this.hz(r-12+(s%2?12:0)),t,spb*.9,'triangle',.16);
+   if(s%2===0)this.note(this.hz(r+12+arp[(s/2)%8]),t,spb*.7,'square',.035);
+   if(s%16===0||s%16===10)this.note(this.hz(r+24+(bar===3?2:0)),t,spb*3,'square',.045);
+   if(s%4===2)this.hat(t,.05);if(s%8===4)this.hat(t,.12);
+   this.step++;this.next+=spb;
+  }
+  this.timer=setTimeout(()=>this.tick(),30);
+ },
+ move(){const c=this.ctx();if(!c||!this.on)return;const t=c.currentTime;this.note(880,t,.05,'square',.08);this.note(1320,t+.04,.06,'square',.06)},
+ confirm(){const c=this.ctx();if(!c)return;const t=c.currentTime;[72,76,79,84,88].forEach((m,i)=>this.note(this.hz(m),t+i*.055,.18,'square',.09));this.note(this.hz(36),t,.5,'sawtooth',.14);this.hat(t+.3,.3)}
+};
+const Sel={idx:0,anim:'idle',animT:0,slide:0,busy:false,raf:0,last:0,
+ keys:()=>ORDER,
+ el:id=>document.getElementById(id),
+ init(){
+  const box=this.el('selTiles');
+  ORDER.forEach((k,i)=>{
+   const b=document.createElement('button');b.type='button';b.className='sel-tile';b.dataset.char=k;b.setAttribute('aria-label',ROSTER[k].name);
+   const cv=document.createElement('canvas');cv.width=96;cv.height=96;b.appendChild(cv);box.appendChild(b);
+   const m=MAP[k],f=m.acts.idle[0],sz=Math.round(m.idleH*.62),top=m.feet-m.idleH-2,ct=cv.getContext('2d');   // ครอปช่วงหัว-ไหล่เป็นรูปโปรไฟล์
+   ct.fillStyle=ROSTER[k].c+'33';ct.fillRect(0,0,96,96);ct.imageSmoothingEnabled=false;
+   ct.drawImage(IMG[k],f[0]+m.cw/2-sz/2,f[1]+Math.max(0,top),sz,sz,0,4,96,96);
+   b.addEventListener('click',()=>{SelAudio.start();if(this.idx===i&&!this.busy)return;this.pick(i)});
+  });
+  this.el('selMute').onclick=()=>{SelAudio.on=!SelAudio.on;this.el('selMute').textContent=SelAudio.on?'♪ ON':'♪ OFF';SelAudio.on?SelAudio.start():SelAudio.stop()};
+  addEventListener('keydown',e=>{
+   if(!this.open()||this.busy)return;SelAudio.start();
+   if(['ArrowLeft','KeyA'].includes(e.code)){this.pick((this.idx+3)%4);e.preventDefault()}
+   else if(['ArrowRight','KeyD'].includes(e.code)){this.pick((this.idx+1)%4);e.preventDefault()}
+   else if(['Enter','Space','KeyJ'].includes(e.code)&&!this.el('start').disabled){this.confirm();e.preventDefault()}
+  });
+  this.el('select').addEventListener('pointerdown',()=>SelAudio.start(),{once:true});
+  this.pick(Math.max(0,ORDER.indexOf(chosen)),true);
+ },
+ open(){return this.el('select').style.display!=='none'},
+ pick(i,silent){
+  this.idx=i;const k=ORDER[i],r=ROSTER[k];chosen=k;
+  if(!silent)SelAudio.move();
+  this.el('select').style.setProperty('--c',r.c);
+  document.querySelectorAll('.sel-tile').forEach((t,j)=>t.classList.toggle('on',j===i));
+  this.el('selName').textContent=r.name;this.el('selBgName').textContent=r.name;this.el('selTag').textContent=r.tag;
+  this.el('selQuote').textContent=r.quote;this.el('selSkill').textContent=r.skill;
+  [['stPow',0],['stSpd',1],['stRng',2]].forEach(([id,n])=>{this.el(id).innerHTML=Array.from({length:5},(_,j)=>`<i class="${j<r.st[n]?'on':''}"></i>`).join('')});
+  this.anim='idle';this.animT=0;this.slide=1;
+ },
+ draw(now){
+  const dt=Math.min(.05,(now-(this.last||now))/1000);this.last=now;this.animT+=dt;this.slide=Math.max(0,this.slide-dt*5);
+  const cv=this.el('selBig'),ct=cv.getContext('2d'),k=ORDER[this.idx],m=MAP[k];
+  const frs=m.acts[this.anim],fps=this.anim==='idle'?6:14;
+  let fi=Math.floor(this.animT*fps);fi=this.anim==='idle'?fi%frs.length:Math.min(fi,frs.length-1);
+  const f=frs[fi],s=300/m.idleH,w=m.cw*s,h=m.ch*s,e=this.slide*this.slide;
+  ct.clearRect(0,0,cv.width,cv.height);ct.imageSmoothingEnabled=false;
+  ct.fillStyle='#0008';ct.beginPath();ct.ellipse(210,346,120,14,0,0,7);ct.fill();
+  ct.globalAlpha=1-e;ct.drawImage(IMG[k],f[0],f[1],m.cw,m.ch,Math.round(210-w/2+e*120),Math.round(350-m.feet*s),Math.round(w),Math.round(h));ct.globalAlpha=1;
+  if(this.open())this.raf=requestAnimationFrame(t=>this.draw(t));
+ },
+ show(){
+  const s=this.el('select');s.classList.remove('go','out');s.style.display='grid';this.busy=false;
+  this.pick(Math.max(0,ORDER.indexOf(chosen)),true);
+  if(game&&game.scene.isActive('stage'))game.scene.pause('stage');
+  SelAudio.start();cancelAnimationFrame(this.raf);this.last=0;this.raf=requestAnimationFrame(t=>this.draw(t));
+ },
+ confirm(){
+  if(this.busy)return;this.busy=true;SelAudio.start();SelAudio.confirm();
+  const k=ORDER[this.idx],s=this.el('select');
+  this.el('selBandTxt').textContent=`${ROSTER[k].name.toUpperCase()} — LET'S GO!`;
+  this.anim='melee';this.animT=0;s.classList.remove('go');void s.offsetWidth;s.classList.add('go');
+  setTimeout(()=>{this.anim='shoot';this.animT=0},520);
+  setTimeout(()=>s.classList.add('out'),1250);
+  setTimeout(()=>{SelAudio.stop();s.style.display='none';s.classList.remove('go','out');startGame()},1600);
+ }
+};
 
 /* ===== SCENE ===== */
 class Stage extends Phaser.Scene{
@@ -607,13 +741,13 @@ function startGame(){
   const sc=game.scene.getScene('stage');sc.scene.restart({char:chosen});
  }
 }
-document.getElementById('start').onclick=startGame;
+document.getElementById('start').onclick=()=>Sel.confirm();
 document.getElementById('restart').onclick=()=>{if(game){const sc=game.scene.getScene('stage');sc.scene.restart({char:sc.charId||chosen})}};
-document.getElementById('pick').onclick=()=>{document.querySelectorAll('.card').forEach(x=>x.classList.toggle('selected',x.dataset.char===chosen));document.getElementById('select').style.display='flex'};
+document.getElementById('pick').onclick=()=>Sel.show();
 
 if(!window.Phaser){err('โหลด Phaser ไม่ได้ — เช็กอินเทอร์เน็ต');return}
 Promise.all(Object.entries(SRC).map(([k,v])=>loadImg(k,v))).then(()=>{
- drawCards();const b=document.getElementById('start');b.disabled=false;b.textContent='START GAME';
+ Sel.init();const b=document.getElementById('start');b.disabled=false;b.textContent='ยืนยัน ▶';Sel.show();
 }).catch(e=>err(e.message));
 })();
 </script>
