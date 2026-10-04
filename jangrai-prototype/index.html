@@ -98,14 +98,30 @@ html,body{margin:0;height:100%;background:#07090d;color:#fff;font-family:system-
 #rotate{display:none;position:fixed;inset:0;z-index:90;background:#080a10ef;align-items:center;justify-content:center;text-align:center;font-size:18px;font-weight:800;padding:28px}
 @media(max-width:720px) and (orientation:portrait){#rotate{display:flex}}
 @media(hover:hover) and (pointer:fine){#controls{opacity:.55}}
+
+/* ปุ่มมือถือ: ซ้าย = เดิน, ขวา = กระโดด (ปุ่มใหญ่ใต้นิ้วโป้ง) + โจมตีรอบๆ */
+.dpad{gap:14px}.dpad .ctrl{width:74px;height:74px}
+.pad{display:grid;grid-template-columns:repeat(3,auto);grid-template-areas:". shoot skill" "ult melee jump";gap:8px 10px;align-items:end;justify-items:center}
+.pad .ctrl{width:60px;height:60px}
+.pad #ult{width:52px;height:52px;align-self:center}
+.pad .ctrl[data-key="melee"]{width:66px;height:66px}
+.jumpbtn{width:80px!important;height:80px!important;border-radius:50%!important;border-color:#7fdcff!important;background:rgba(40,120,170,.55)!important;font-size:26px!important;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.jumpbtn small{font-size:11px;font-weight:800;margin-top:2px}
+@media (max-height:420px){.dpad .ctrl{width:64px;height:64px}.pad .ctrl{width:52px;height:52px}.pad .ctrl[data-key="melee"]{width:58px;height:58px}.pad #ult{width:46px;height:46px}.jumpbtn{width:70px!important;height:70px!important}}
 </style>
 </head>
 <body>
 <div id="wrap"></div>
 <div id="topbar"><button id="pick">เลือกตัว</button><button id="restart">RESTART</button></div>
 <div id="controls">
- <div class="group"><button class="ctrl" data-key="left">◀</button><button class="ctrl" data-key="right">▶</button><button class="ctrl" data-key="jump">▲</button></div>
- <div class="group"><button class="ctrl action" data-key="shoot">ยิง<br>J</button><button class="ctrl action" data-key="melee">ตี<br>K</button><button class="ctrl action" id="skill" data-key="skill">SKILL<br>L</button><button class="ctrl action" id="ult" data-key="ult">ULT<br>I</button></div>
+ <div class="group dpad"><button class="ctrl" data-key="left" aria-label="ซ้าย">◀</button><button class="ctrl" data-key="right" aria-label="ขวา">▶</button></div>
+ <div class="group pad">
+  <button class="ctrl action" data-key="shoot" style="grid-area:shoot">ยิง<br>J</button>
+  <button class="ctrl action" id="skill" data-key="skill" style="grid-area:skill">SKILL<br>L</button>
+  <button class="ctrl action" id="ult" data-key="ult" style="grid-area:ult">ULT<br>I</button>
+  <button class="ctrl action" data-key="melee" style="grid-area:melee">ตี<br>K</button>
+  <button class="ctrl jumpbtn" data-key="jump" style="grid-area:jump" aria-label="กระโดด">▲<small>โดด</small></button>
+ </div>
 </div>
 <div id="select">
  <div class="sel-head"><div class="sel-logo">จังไรออนไลน์</div><div class="sel-title">SELECT YOUR FIGHTER</div><button id="selMute" type="button">♪ ON</button></div>
@@ -143,7 +159,7 @@ const SRC={pt_phee:'data:image/webp;base64,UklGRkavAQBXRUJQVlA4WAoAAAAQAAAALwIAL
 const MAP={"enemy":{"cw":246,"ch":160,"feet":158,"idleH":148,"acts":{"idle":[[0,0],[246,0],[492,0],[738,0]],"run":[[0,160],[246,160],[492,160],[738,160],[984,160],[1230,160],[1476,160],[1722,160]],"jump":[[0,320],[246,320],[492,320]],"shoot":[[0,480],[246,480],[492,480],[738,480]],"melee":[[0,640],[246,640],[492,640],[738,640],[984,640],[1230,640]],"hit":[[0,800],[246,800]],"death":[[0,960],[246,960],[492,960],[738,960],[984,960],[1230,960]],"attack":[[0,640],[246,640],[492,640],[738,640],[984,640],[1230,640]]}},"wairoon":{"cw":216,"ch":169,"feet":167,"idleH":157,"acts":{"idle":[[0,0],[216,0],[432,0],[648,0]],"run":[[0,169],[216,169],[432,169],[648,169],[864,169],[1080,169],[1296,169],[1512,169],[1728,169]],"jump":[[0,338],[216,338],[432,338]],"shoot":[[0,507],[216,507],[432,507],[648,507]],"melee":[[0,676],[216,676],[432,676],[648,676],[864,676]],"hit":[[0,845],[216,845]],"death":[[0,1014],[216,1014],[432,1014],[648,1014],[864,1014],[1080,1014]]}},"soja":{"cw":258,"ch":155,"feet":153,"idleH":145,"acts":{"idle":[[0,0],[258,0],[516,0],[774,0]],"run":[[0,155],[258,155],[516,155],[774,155],[1032,155],[1290,155],[1548,155],[1806,155],[2064,155]],"jump":[[0,310],[258,310],[516,310]],"shoot":[[0,465],[258,465],[516,465],[774,465]],"melee":[[0,620],[258,620],[516,620],[774,620],[1032,620]],"hit":[[0,775],[258,775]],"death":[[0,930],[258,930],[516,930],[774,930],[1032,930],[1290,930]]}},"phee":{"cw":298,"ch":153,"feet":151,"idleH":149,"acts":{"idle":[[0,0],[298,0],[596,0],[894,0]],"run":[[0,153],[298,153],[596,153],[894,153],[1192,153],[1490,153],[1788,153],[2086,153]],"jump":[[0,306],[298,306],[596,306]],"shoot":[[0,459],[298,459],[596,459],[894,459]],"melee":[[0,612],[298,612],[596,612],[894,612],[1192,612]],"hit":[[0,765],[298,765]],"death":[[0,918],[298,918],[596,918],[894,918],[1192,918],[1490,918]]}},"em":{"cw":230,"ch":167,"feet":165,"idleH":141,"acts":{"idle":[[0,0],[230,0],[460,0],[690,0]],"run":[[0,167],[230,167],[460,167],[690,167],[920,167],[1150,167],[1380,167],[1610,167]],"jump":[[0,334],[230,334],[460,334]],"shoot":[[0,501],[230,501],[460,501],[690,501]],"melee":[[0,668],[230,668],[460,668],[690,668],[920,668]],"hit":[[0,835],[230,835]],"death":[[0,1002],[230,1002],[460,1002],[690,1002],[920,1002],[1150,1002],[1380,1002]]}}};
 
 /* ===== CONFIG ===== */
-const W=960,H=540,WORLD=2700,FLOOR=448,GRAV=1120;
+const W=960,H=540,WORLD=5200,FLOOR=448,GRAV=1120;
 const CHARS={
  phee:   {name:'พี่ขอ',        speed:232,bullet:0xa8ef63,shootFx:'fx_hit_small',         meleeFx:'fx_pheekhor_bowl_impact',skillCd:2.6,meleeDmg:36},
  soja:   {name:'ซ้อจ๋า',        speed:252,bullet:0xff69c6,shootFx:'fx_sorja_heart',       meleeFx:'fx_hit_heavy',          skillCd:2.4,meleeDmg:34},
@@ -155,12 +171,25 @@ const FX_ORDER=['fx_hit_small','fx_hit_heavy','fx_run_dust','fx_landing_dust','f
 const FX={fx_hit_small:{n:4,fps:18,ox:.5,oy:.5},fx_hit_heavy:{n:4,fps:16,ox:.5,oy:.5},fx_run_dust:{n:5,fps:14,ox:.5,oy:1},fx_landing_dust:{n:5,fps:16,ox:.5,oy:1},fx_explosion:{n:6,fps:15,ox:.5,oy:1},fx_smoke:{n:6,fps:10,ox:.5,oy:1},fx_tum_slingshot_snap:{n:4,fps:18,ox:.5,oy:.5},fx_em_chain_arc:{n:5,fps:14,ox:.5,oy:.5},fx_sorja_heart:{n:5,fps:14,ox:.5,oy:.5},fx_pheekhor_bowl_impact:{n:5,fps:14,ox:.5,oy:.5}};
 const ANIM_FPS={idle:6,run:12,jump:9,shoot:13,melee:14,hit:10,death:8,attack:11};
 const LOOPING={idle:1,run:1};
-const WAVES=[
- {trigger:560,left:480,right:1180,enemies:[720,880,1040]},
- {trigger:1320,left:1240,right:2040,enemies:[1480,1660,1840,1960]},
- {trigger:2070,left:2000,right:2690,enemies:[2220,2350,2460]}
+/* ===== โครงด่าน: 3 ช่วงต่อสู้ + มินิบอส + บอส (ราว 6-8 นาที) ===== */
+const STAGE=[
+ {type:'wave',trigger:560, left:420, right:1400,spawn:['baton','baton','baton'],title:'ช่วง 1 • ตำรวจกระบอง'},
+ {type:'wave',trigger:1560,left:1440,right:2400,spawn:['baton','gun','baton','gun'],title:'ช่วง 2 • ระวังตัวยิง! กระโดดหลบกระสุน'},
+ {type:'mini',trigger:2560,left:2440,right:3400,x:3200,title:'มินิบอส • จ่าโหด'},
+ {type:'wave',trigger:3560,left:3440,right:4400,spawn:['shield','baton','gun','shield','baton'],title:'ช่วง 3 • ตำรวจโล่ ตีข้างหลังหรือใช้สกิล'},
+ {type:'boss',trigger:4540,left:4240,right:5200,x:5000,title:'บอส • ผู้กองด่านตรวจ'}
 ];
-const BOSS={x:2550,left:1740,right:2690,hp:600,scale:2.4};
+/* ลังไม้ / ถังขยะ ตีแตกแล้วมีของ */
+const PROPS=[[880,'crate'],[1480,'bin'],[2250,'crate'],[2470,'bin'],[3480,'crate'],[4300,'bin'],[4470,'crate']];
+/* ชนิดศัตรู (ใช้สไปรต์ตำรวจตัวเดียว ต่างกันที่สี/ขนาด/พฤติกรรม) */
+const ETYPE={
+ baton: {hp:90, h:100,tint:0,       speed:95},
+ gun:   {hp:70, h:98, tint:0x8fc8ff,speed:110},
+ shield:{hp:120,h:104,tint:0xc9ced6,speed:72},
+ mini:  {hp:380,h:126,tint:0xffa850,speed:88, name:'จ่าโหด'},
+ boss:  {hp:700,h:140,tint:0xff5555,speed:78, name:'ผู้กองด่านตรวจ'}
+};
+
 
 /* ===== INPUT จากปุ่มบนจอ (มีคิวกด กันกดเร็วแล้วหลุด) ===== */
 const touch={},tapQ={};
@@ -337,9 +366,10 @@ class Stage extends Phaser.Scene{
 
   /* parallax: tileSprite ติดกล้อง เลื่อนตาม scrollX — วาดครั้งเดียว ไม่ต้องวาดใหม่ทุกเฟรม */
   const L=[['far',.06,0,185,948],['city',.14,116,190,1010],['over',.28,220,184,1030],['near',.52,320,150,980]];
+  // ใช้ภาพต่อกันหลายแผ่น (สลับกลับด้านกันรอยต่อ) แทน tileSprite ที่เพี้ยนเมื่อด่านยาว
   this.bg=L.map(([k,sp,y,h,tw],i)=>{
-   const img=IMG[k],ts=this.add.tileSprite(0,y,W,h,k).setOrigin(0).setScrollFactor(0).setDepth(-20+i);
-   ts.setTileScale(tw/img.naturalWidth,h/img.naturalHeight);ts.sp=sp;return ts;
+   const imgs=[];for(let j=0;j<Math.ceil(W/tw)+2;j++)imgs.push(this.add.image(0,y,k).setOrigin(0).setScrollFactor(0).setDepth(-20+i).setDisplaySize(tw+1,h));
+   return {sp,tw,imgs};
   });
 
   /* พื้น + พร็อพ วาดลง world ครั้งเดียว */
@@ -354,7 +384,7 @@ class Stage extends Phaser.Scene{
   const ground=this.add.zone(WORLD/2,FLOOR+40,WORLD,80);this.physics.add.existing(ground,true);
 
   /* player */
-  this.ps={hp:180,maxHp:180,face:1,lock:0,inv:0,dead:false,skillCd:0,ult:100,dash:null,coyote:0,jumpBuf:0,lastDust:0,wasGround:true};
+  this.ps={hp:180,maxHp:180,face:1,lock:0,inv:0,dead:false,skillCd:0,ult:100,dash:null,coyote:0,jumpBuf:0,lastDust:0,wasGround:true,buff:0,buffOn:false};
   this.player=this.physics.add.sprite(150,FLOOR-80,'spr_'+this.charId,'idle_0').setDepth(6);
   this.fitBody(this.player,this.charId,108,45,80);
   this.player.setCollideWorldBounds(true);
@@ -366,8 +396,17 @@ class Stage extends Phaser.Scene{
   this.physics.add.collider(this.enemies,ground);
   this.physics.add.collider(this.enemies,this.enemies);
   this.kills=0;this.coins=0;this.total=0;this.ended=false;
-  this.waveIndex=0;this.waveActive=false;this.waveClearing=false;this.currentWave=-1;
-  this.arenaWalls=[];this.arenaColliders=[];this.boss=null;this.bossSpawned=false;
+  this.encIdx=-1;this.encNext=0;this.encActive=false;this.encClearing=false;this.encPending=0;this.bannerId=0;
+  this.arenaWalls=[];this.arenaColliders=[];this.arena=null;this.boss=null;this.bigFoe=null;
+  this.eshots=[];
+  /* ไอเทมที่ดรอป + ลังไม้/ถังขยะ */
+  this.makeItemTextures();
+  this.items=this.physics.add.group();
+  this.physics.add.collider(this.items,ground);
+  this.physics.add.overlap(this.player,this.items,(pl,it)=>this.collect(it));
+  this.props=this.physics.add.group({allowGravity:false,immovable:true});
+  for(const [x,k] of PROPS){const c=this.props.create(x,FLOOR-(k==='bin'?25:22),'it_'+k).setDepth(3);Object.assign(c,{isProp:true,hp:k==='bin'?2:3,dead:false,inv:0,kind:k})}
+  this.physics.add.collider(this.player,this.props);
 
   this.shots=[];
 
@@ -391,7 +430,10 @@ class Stage extends Phaser.Scene{
   this.add.text(W/2,22,'JANGRAI ONLINE • STAGE 1 • ด่านตรวจนครป่วน',st('18px','#f9cb3b')).setOrigin(.5,0).setScrollFactor(0).setDepth(101);
   this.tMsg=this.add.text(W/2,240,'',{...st('40px','#ffd43b'),strokeThickness:6,align:'center'}).setOrigin(.5).setScrollFactor(0).setDepth(102).setVisible(false);
   this.tPop=this.add.text(W/2,130,'',st('16px','#ffb4b4')).setOrigin(.5).setScrollFactor(0).setDepth(102).setAlpha(0);
+  this.tBoss=this.add.text(W/2,60,'',st('14px','#ffb0b0')).setOrigin(.5,0).setScrollFactor(0).setDepth(101);
+  this.tBuff=this.add.text(214,82,'',st('14px','#ffd43b')).setScrollFactor(0).setDepth(101);
   this.hudKey='';
+  this.time.delayedCall(700,()=>this.pop('เดินไปทางขวา → ตีลังไม้/ถังขยะได้ของ!'));
   this.btnSkill=document.getElementById('skill');this.btnUlt=document.getElementById('ult');this.btnKey='';
   this.switchChar(this.charId,true);
  }
@@ -402,7 +444,7 @@ class Stage extends Phaser.Scene{
  fx(key,x,y,scale=1,flip=false){const f=FX[key];const s=this.add.sprite(x,y,'fx').setOrigin(f.ox,f.oy).setScale(scale).setFlipX(flip).setDepth(8);s.play(key);s.once('animationcomplete',()=>s.destroy());return s}
  pop(msg){this.tPop.setText(msg).setAlpha(1);this.tweens.killTweensOf(this.tPop);this.tweens.add({targets:this.tPop,alpha:0,delay:500,duration:300})}
  alive(){return this.enemies.getChildren().filter(e=>!e.dead)}
- hitRect(x,y,w,h){const r=new Phaser.Geom.Rectangle(x,y,w,h);return this.alive().filter(e=>Phaser.Geom.Rectangle.Overlaps(r,new Phaser.Geom.Rectangle(e.body.x,e.body.y,e.body.width,e.body.height)))}
+ hitRect(x,y,w,h){const r=new Phaser.Geom.Rectangle(x,y,w,h);return this.alive().concat(this.props?this.props.getChildren().filter(c=>!c.dead):[]).filter(e=>Phaser.Geom.Rectangle.Overlaps(r,new Phaser.Geom.Rectangle(e.body.x,e.body.y,e.body.width,e.body.height)))}
  /* ปรับขนาดตัวละครให้สูง targetH px และวาง hitbox (กว้าง bw x สูง bh px) ที่เท้า */
  fitBody(o,kind,targetH,bw,bh){
   const m=MAP[kind],s=targetH/m.idleH;o.setScale(s);
@@ -418,16 +460,15 @@ class Stage extends Phaser.Scene{
  }
 
  /* ---------- encounters ---------- */
- spawnEnemyAt(x,opt={}){
-  const e=this.enemies.create(x,FLOOR-80,'spr_enemy','idle_0');
-  const boss=!!opt.boss;
-  e.setDepth(boss?6:5);
-  if(boss)this.fitBody(e,'enemy',140,70,106);else this.fitBody(e,'enemy',100,45,72);
-  const hp=opt.hp||(boss?BOSS.hp:90);
-  Object.assign(e,{hp,maxHp:hp,lock:0,cd:0,inv:0,dead:false,atk:0,boss,
-   wave:opt.wave??this.currentWave,summoned:!!opt.summoned,specialCd:boss?1.8:0,summonCd:boss?4.8:0,
-   charging:0,chargeDir:1});
-  if(boss)e.setTint(0xff5555);
+ spawnEnemyAt(x,type='baton',opt={}){
+  const T=ETYPE[type],big=type==='mini'||type==='boss';
+  const e=this.enemies.create(x,FLOOR-110,'spr_enemy','idle_0');
+  e.setDepth(big?6:5);
+  this.fitBody(e,'enemy',T.h,big?60:45,big?96:72);
+  Object.assign(e,{type,hp:T.hp,maxHp:T.hp,lock:0,cd:.5+Math.random()*.6,inv:0,dead:false,atk:0,boss:type==='boss',big,
+   wave:opt.wave??this.encIdx,specialCd:big?2:0,summonCd:4.8,charging:0,chargeDir:1,slam:0,slamT:0,shield:type==='shield',phase:1,baseTint:T.tint});
+  if(T.tint)e.setTint(T.tint);
+  if(e.shield)e.shieldG=this.add.rectangle(x,FLOOR-40,12,58,0x9aa4b4).setStrokeStyle(2,0x22262e).setDepth(7);
   e.play('enemy_idle');this.total++;return e;
  }
  lockArena(left,right){
@@ -436,6 +477,7 @@ class Stage extends Phaser.Scene{
   // กรงต้องครอบผู้เล่นเสมอ และกว้างไม่น้อยกว่าจอ (กันผู้เล่นติดนอกกรง / จอเห็นที่ว่างนอกแมพ)
   left=Math.min(left,p.x-90);right=Math.min(WORLD,Math.max(right,p.x+90));
   if(right-left<W)left=Math.max(0,right-W);
+  this.arena={left,right};
   // เลื่อนกล้องเข้ากรงแบบนุ่ม แทนการกระตุกทันที
   const target=Phaser.Math.Clamp(cam.scrollX,left,right-W);
   cam.stopFollow();
@@ -450,76 +492,212 @@ class Stage extends Phaser.Scene{
  unlockArena(resetCam=true){
   for(const c of this.arenaColliders||[])if(c&&c.destroy)c.destroy();
   for(const w of this.arenaWalls||[])if(w&&w.destroy)w.destroy();
-  this.arenaColliders=[];this.arenaWalls=[];
+  this.arenaColliders=[];this.arenaWalls=[];this.arena=null;
   if(resetCam){const cam=this.cameras.main;cam.setBounds(0,0,WORLD,H);if(!cam._follow)cam.startFollow(this.player,true,.12,.12,-W*.12,0)}
  }
- startWave(i){
-  if(this.waveActive||i>=WAVES.length)return;
-  const w=WAVES[i];this.currentWave=i;this.waveActive=true;this.waveClearing=false;
-  this.lockArena(w.left,w.right);this.pop(`WAVE ${i+1}/3`);
-  w.enemies.forEach((x,n)=>this.time.delayedCall(n*160,()=>this.spawnEnemyAt(x,{wave:i})));
+ banner(text,color='#ffd43b',ms=1400){
+  const id=++this.bannerId;this.tMsg.setText(text).setColor(color).setVisible(true);
+  this.time.delayedCall(ms,()=>{if(this.bannerId===id&&!this.ended&&!this.ps.dead)this.tMsg.setVisible(false)});
  }
- finishWave(){
-  if(!this.waveActive||this.waveClearing)return;
-  this.waveClearing=true;const cleared=this.currentWave;
-  this.tMsg.setText(`WAVE ${cleared+1} CLEAR!`).setColor('#8dff9a').setVisible(true);
-  this.time.delayedCall(650,()=>{
-   this.tMsg.setVisible(false);this.waveActive=false;this.waveClearing=false;this.waveIndex=cleared+1;
-   if(this.waveIndex<WAVES.length)this.unlockArena(true);   // ระลอกสุดท้าย: ไม่ปลดกรง ส่งต่อเข้าห้องบอสเลย กล้องไม่เด้งไปมา
-   if(this.waveIndex>=WAVES.length)this.time.delayedCall(750,()=>this.spawnBoss());
-   else this.pop('ไปต่อ!');
-  });
+ startEnc(i){
+  const E=STAGE[i];this.encIdx=i;this.encActive=true;this.encClearing=false;
+  this.lockArena(E.left,E.right);
+  this.banner(E.title,E.type==='wave'?'#8dff9a':E.type==='mini'?'#ffb060':'#ff6060',1800);
+  if(E.type==='wave'){
+   this.encPending=E.spawn.length;
+   E.spawn.forEach((t,n)=>this.time.delayedCall(400+n*600,()=>{
+    if(this.ended)return;const a=this.arena||E,p=this.player;
+    const fromLeft=n%2===1&&p.x-a.left>320;                 // เข้ามาจากขอบกรง ไม่โผล่ทับตัวผู้เล่น
+    this.spawnEnemyAt(fromLeft?a.left+50:a.right-50,t,{wave:i});this.encPending--;
+   }));
+  }else{
+   this.encPending=1;
+   if(E.type==='boss')SFX.play('ult');
+   this.time.delayedCall(1100,()=>{
+    const e=this.spawnEnemyAt(E.x,E.type,{wave:i});this.bigFoe=e;if(E.type==='boss')this.boss=e;
+    this.setT(this.tBoss,ETYPE[E.type].name);this.encPending=0;
+   });
+  }
  }
- spawnBoss(){
-  if(this.bossSpawned||this.ended)return;
-  this.bossSpawned=true;this.currentWave=99;this.lockArena(BOSS.left,BOSS.right);
-  this.tMsg.setText('WARNING!\nBOSS').setColor('#ff6666').setVisible(true);
-  this.time.delayedCall(700,()=>this.tMsg.setVisible(false));
-  this.boss=this.spawnEnemyAt(BOSS.x,{boss:true,wave:99,hp:BOSS.hp});
- }
- summonBossMinions(boss){
-  if(!boss||boss.dead)return;
-  const aliveAdds=this.enemies.getChildren().filter(e=>!e.dead&&!e.boss&&e.wave===99).length;
-  if(aliveAdds>=4)return;
-  SFX.play('skill');this.pop('บอสเรียกลูกน้อง!');
-  const spots=[boss.x-150,boss.x+150];
-  spots.forEach((x,i)=>this.time.delayedCall(180+i*180,()=>{
-   if(!boss.dead)this.spawnEnemyAt(Phaser.Math.Clamp(x,BOSS.left+70,BOSS.right-70),{wave:99,summoned:true,hp:70});
-  }));
+ finishEnc(){
+  this.encClearing=true;const E=STAGE[this.encIdx];
+  if(E.type==='boss')return;                                   // จบด่านที่ winBoss
+  this.banner(E.type==='mini'?'จ่าโหดร่วงแล้ว!':'CLEAR!','#8dff9a',900);
+  this.time.delayedCall(900,()=>{this.encActive=false;this.encClearing=false;this.encNext=this.encIdx+1;this.bigFoe=null;this.unlockArena(true);this.pop('ไปต่อ! →')});
  }
  updateEncounter(){
   if(this.ended||this.ps.dead)return;
-  if(this.waveActive){
-   const aliveWave=this.enemies.getChildren().some(e=>!e.dead&&e.wave===this.currentWave);
-   if(!aliveWave&&this.total>0)this.finishWave();
+  if(this.encActive){
+   if(this.encPending>0||this.encClearing)return;
+   if(!this.enemies.getChildren().some(e=>!e.dead&&e.wave===this.encIdx))this.finishEnc();
    return;
   }
-  if(!this.bossSpawned&&this.waveIndex<WAVES.length&&this.player.x>=WAVES[this.waveIndex].trigger)this.startWave(this.waveIndex);
+  const n=this.encNext;if(n<STAGE.length&&this.player.x>=STAGE[n].trigger)this.startEnc(n);
+ }
+ summonMinions(boss){
+  if(!boss||boss.dead||!this.arena)return;
+  const adds=this.enemies.getChildren().filter(e=>!e.dead&&!e.big&&e.wave===boss.wave).length;
+  if(adds>=4)return;
+  SFX.play('skill');this.pop('ผู้กองเรียกลูกน้อง!');
+  const types=boss.phase===2?['baton','gun']:['baton','baton'],a=this.arena;
+  types.forEach((t,i)=>this.time.delayedCall(180+i*220,()=>{if(!boss.dead)this.spawnEnemyAt(i?a.left+50:a.right-50,t,{wave:boss.wave})}));
  }
  winBoss(){
   if(this.ended)return;
   this.ended=true;this.unlockArena(true);
-  for(const e of this.enemies.getChildren())if(!e.dead&&!e.boss){e.dead=true;e.setVelocity(0,0);e.body.enable=false;e.setVisible(false)}
-  this.time.delayedCall(650,()=>this.tMsg.setText('เคลียร์ด่านแล้ว!\nโค่นบอสสำเร็จ').setColor('#ffd43b').setVisible(true));
+  for(const e of this.enemies.getChildren())if(!e.dead&&!e.boss){e.dead=true;e.setVelocity(0,0);e.body.enable=false;e.setVisible(false);if(e.shieldG){e.shieldG.destroy();e.shieldG=null}}
+  this.time.delayedCall(900,()=>this.tMsg.setText(`เคลียร์ด่านแล้ว!\nโค่นผู้กองสำเร็จ • 🪙 ${this.coins}`).setColor('#ffd43b').setVisible(true));
+ }
+
+ /* ---------- ไอเทม / ลังไม้ ---------- */
+ makeItemTextures(){
+  if(this.textures.exists('it_food'))return;
+  const g=this.make.graphics({x:0,y:0,add:false});
+  g.fillStyle(0x000000,.35).fillEllipse(16,27,30,6);                                   // ข้าวมันไก่
+  g.fillStyle(0xffffff).fillEllipse(16,22,30,12);g.fillStyle(0xf3e7b5).fillEllipse(16,18,20,10);
+  g.fillStyle(0xd9893b).fillRect(9,12,14,6);g.fillStyle(0xf0b060).fillRect(10,12,12,2);g.fillStyle(0x3fae49).fillRect(23,16,4,4);
+  g.generateTexture('it_food',32,30);g.clear();
+  g.fillStyle(0x7a5a00).fillRect(8,3,14,26);g.fillStyle(0xffd43b).fillRect(9,5,12,23);       // เครื่องดื่มชูกำลัง
+  g.fillStyle(0xd62828).fillRect(9,11,12,9);g.fillStyle(0xffd43b).fillRect(12,13,6,5);g.fillStyle(0xd0d0d0).fillRect(9,2,12,3);
+  g.generateTexture('it_drink',30,30);g.clear();
+  g.fillStyle(0x9a6b00).fillCircle(9,9,9);g.fillStyle(0xffd43b).fillCircle(9,9,7);g.fillStyle(0xfff3a0).fillRect(7,4,3,10);   // เหรียญ
+  g.generateTexture('it_coin',18,18);g.clear();
+  g.fillStyle(0x5a3618).fillRect(0,0,44,44);g.fillStyle(0x9a6a3a).fillRect(3,3,38,38);         // ลังไม้
+  g.lineStyle(4,0x5a3618).lineBetween(5,5,39,39).lineBetween(39,5,5,39);g.fillStyle(0xb98550).fillRect(3,3,38,4);
+  g.generateTexture('it_crate',44,44);g.clear();
+  g.fillStyle(0x15502a).fillRect(3,8,30,42);g.fillStyle(0x2f9a52).fillRect(6,10,24,38);       // ถังขยะ
+  g.fillStyle(0x23793f).fillRect(10,14,3,30).fillRect(18,14,3,30).fillRect(26,14,2,30);
+  g.fillStyle(0x184f2a).fillRect(0,2,36,8);g.fillStyle(0x0f2f18).fillRect(13,0,10,3);
+  g.generateTexture('it_bin',36,50);g.destroy();
+ }
+ floatText(x,y,txt,color='#fff',size=16){
+  const t=this.add.text(x,y,txt,{fontFamily:'system-ui,sans-serif',fontSize:size+'px',fontStyle:'bold',color,stroke:'#000',strokeThickness:4}).setOrigin(.5).setDepth(20);
+  this.tweens.add({targets:t,y:y-38,alpha:0,duration:720,ease:'Cubic.easeOut',onComplete:()=>t.destroy()});
+ }
+ dropItem(kind,x,y){
+  const it=this.items.create(x,y,'it_'+kind).setDepth(4);
+  it.kind=kind;it.born=this.time.now;it.setBounce(.35).setCollideWorldBounds(true);
+  it.setVelocity(Phaser.Math.Between(-110,110),Phaser.Math.Between(-320,-220));
+ }
+ dropLoot(x,y,src){
+  const r=Math.random(),coins=n=>{for(let i=0;i<n;i++)this.dropItem('coin',x,y)};
+  if(src==='mini'){this.dropItem('food',x-20,y);this.dropItem('drink',x+20,y);coins(5);return}
+  if(src==='boss'){coins(10);return}
+  if(src==='crate'){if(r<.4)this.dropItem('food',x,y);else if(r<.65)this.dropItem('drink',x,y);else coins(3);return}
+  if(r<.12)this.dropItem('food',x,y);else if(r<.2)this.dropItem('drink',x,y);else if(r<.6)coins(1+Math.floor(Math.random()*3));
+ }
+ collect(it){
+  if(!it.active||this.time.now-it.born<300||this.ps.dead)return;
+  const s=this.ps,k=it.kind,x=it.x,y=it.y-24;
+  if(k==='food'){s.hp=Math.min(s.maxHp,s.hp+50);this.floatText(x,y,'ข้าวมันไก่ +50','#7dff8a');SFX.tone(660,.08,'square',.7,220);SFX.tone(990,.1,'square',.6,200,.08)}
+  else if(k==='drink'){s.buff=8;this.floatText(x,y,'พลังกระทิง! ⚡ 8 วิ','#ffd43b',18);SFX.tone(440,.25,'sawtooth',.6,660)}
+  else{this.coins+=10;this.floatText(x,y,'+10','#ffe066',13);SFX.tone(1320,.05,'square',.45);SFX.tone(1760,.07,'square',.4,0,.05)}
+  it.destroy();
+ }
+ hitProp(c,heavy){
+  if(c.dead||c.inv>0)return false;
+  c.inv=.15;c.hp-=heavy?3:1;SFX.play('hit');
+  this.fx('fx_hit_small',c.x,c.y-6,.5,false);
+  this.tweens.add({targets:c,x:c.x+4,duration:40,yoyo:true,repeat:1});
+  if(c.hp<=0){
+   c.dead=true;c.body.enable=false;this.fx('fx_smoke',c.x,FLOOR+6,.6,false);
+   this.tweens.add({targets:c,alpha:0,scaleY:.3,duration:200,onComplete:()=>c.destroy()});
+   this.dropLoot(c.x,c.y-20,'crate');
+  }
+  return true;
  }
 
  /* ---------- combat ---------- */
- damageEnemy(e,dmg,kb,fxKey='fx_hit_small',fxScale=.65){
+ damageEnemy(e,dmg,kb,fxKey='fx_hit_small',fxScale=.65,heavy=false){
   if(e.dead||e.inv>0)return false;
-  e.hp=Math.max(0,e.hp-dmg);e.inv=.1;e.lock=.2;e.atk++;
+  if(e.isProp)return this.hitProp(e,heavy);
+  if(e.shield){
+   const front=(kb>0&&e.flipX)||(kb<0&&!e.flipX);           // ศัตรูหันหน้าเข้าหาผู้โจมตี = โดนโล่
+   if(front&&!heavy){
+    e.inv=.12;e.setVelocityX(kb*.25);this.fx('fx_hit_small',e.x+(e.flipX?-26:26),e.body.y+e.body.height*.45,.5,false);
+    SFX.tone(1500,.05,'square',.5);this.floatText(e.x,e.body.y-8,'BLOCK','#cfd8e3',14);return false;
+   }
+   if(heavy){e.shield=false;this.floatText(e.x,e.body.y-26,'โล่แตก!','#ffd43b',18);
+    if(e.shieldG){const sg=e.shieldG;e.shieldG=null;this.tweens.add({targets:sg,y:FLOOR-6,angle:90,alpha:0,duration:500,onComplete:()=>sg.destroy()})}}
+  }
+  if(this.ps.buff>0)dmg=Math.round(dmg*1.5);
+  e.hp=Math.max(0,e.hp-dmg);e.inv=.1;
+  if(e.big){e.lock=Math.max(e.lock,.06);kb*=.3}else{e.lock=.2;e.atk++;e.charging=0}
   SFX.play('hit');
-  e.setVelocityX(kb);e.setTintFill(0xffffff);this.time.delayedCall(60,()=>{if(e.active){e.clearTint();if(e.boss)e.setTint(0xff5555)}});
+  e.setVelocityX(kb);e.setTintFill(0xffffff);this.time.delayedCall(60,()=>{if(e.active){e.clearTint();if(e.baseTint)e.setTint(e.baseTint)}});
   this.fx(fxKey,e.x,e.body.y+e.body.height*.35,fxScale,kb<0);
+  this.floatText(e.x+Phaser.Math.Between(-10,10),e.body.y-6,String(dmg),this.ps.buff>0?'#ffd43b':'#ffffff',e.big?18:15);
   this.cameras.main.shake(70,.004);
   this.ps.ult=Math.min(100,this.ps.ult+8);
   if(e.hp<=0){
-   e.dead=true;this.kills++;this.coins+=e.boss?250:25;this.ps.ult=Math.min(100,this.ps.ult+15);SFX.play('death');
+   e.dead=true;this.kills++;this.coins+=e.boss?250:e.type==='mini'?100:25;this.ps.ult=Math.min(100,this.ps.ult+15);SFX.play('death');
    this.act(e,'enemy','death',true);e.setVelocity(0,0);
+   if(e.shieldG){e.shieldG.destroy();e.shieldG=null}
    this.time.delayedCall(350,()=>{if(e.body)e.body.enable=false});
-   this.tweens.add({targets:e,alpha:0,delay:e.boss?1200:900,duration:400,onComplete:()=>e.setVisible(false)});
+   this.time.delayedCall(320,()=>this.dropLoot(e.x,e.body.y,e.type==='mini'?'mini':e.boss?'boss':'enemy'));
+   this.tweens.add({targets:e,alpha:0,delay:e.big?1200:900,duration:400,onComplete:()=>e.setVisible(false)});
    if(e.boss)this.winBoss();
-  }else this.act(e,'enemy','hit',true);
+  }else{
+   if(!e.big||(!e.charging&&!e.slam))this.act(e,'enemy','hit',true);
+   if(e.boss&&e.phase===1&&e.hp<=e.maxHp/2){
+    e.phase=2;e.baseTint=0xff2020;e.specialCd=0;this.banner('ผู้กองโกรธแล้ว! ⚠','#ff4040',1200);this.cameras.main.shake(320,.012);
+   }
+  }
   return true;
+ }
+ enemyShoot(e,dir){
+  const y=e.body.y+e.body.height*.42,x=e.x+dir*42;
+  this.fx('fx_hit_small',x,y,.45,dir<0);SFX.tone(260,.09,'square',.6,-120);
+  const o=this.add.rectangle(x,y,16,6,0xffa020).setStrokeStyle(2,0xfff1a0).setDepth(7);
+  this.eshots.push({o,vx:dir*380,life:2.6});
+ }
+ updateEnemyShots(dt){
+  const pb=this.player.body;
+  for(let i=this.eshots.length-1;i>=0;i--){
+   const s=this.eshots[i];s.o.x+=s.vx*dt;s.life-=dt;let end=s.life<=0;
+   if(!end&&!this.ps.dead&&s.o.x>pb.x&&s.o.x<pb.right&&s.o.y>pb.y&&s.o.y<pb.bottom){this.hurtPlayer(12,Math.sign(s.vx));end=true}
+   if(end){s.o.destroy();this.eshots.splice(i,1)}
+  }
+ }
+ slamImpact(e){
+  this.cameras.main.shake(260,.014);SFX.play('ult');
+  for(const sx of [-1,1]){this.fx('fx_landing_dust',e.x+sx*60,FLOOR+6,1.1,sx<0);this.fx('fx_smoke',e.x+sx*120,FLOOR+6,.7,sx<0)}
+  const p=this.player;
+  if(Math.abs(p.x-e.x)<190&&(p.body.blocked.down||p.body.touching.down))this.hurtPlayer(22,Math.sign(p.x-e.x)||1);
+ }
+ bigAI(e,dt,dx,dist,dir){
+  const p=this.player,mini=e.type==='mini',ph2=e.phase===2;
+  if(e.charging>0){
+   e.charging=Math.max(0,e.charging-dt);e.setVelocityX(e.chargeDir*(ph2?560:470));this.act(e,'enemy','run');
+   if(Math.abs(p.x-e.x)<80&&Math.abs(p.body.bottom-e.body.bottom)<80){this.hurtPlayer(mini?22:26,e.chargeDir);e.charging=0;e.setVelocityX(-e.chargeDir*120)}
+   else if(e.body.blocked.left||e.body.blocked.right){e.charging=0;e.lock=.9;this.cameras.main.shake(160,.008);this.floatText(e.x,e.body.y-24,'ชนกำแพง! มึน','#ffe066',16)}
+   return;
+  }
+  if(e.slam===1){
+   if(this.time.now-e.slamT>250&&e.body.blocked.down){e.slam=0;e.lock=.55;e.setVelocityX(0);this.slamImpact(e)}
+   return;
+  }
+  if(e.lock>0){if(e.body.blocked.down)e.setVelocityX(e.body.velocity.x*Math.pow(.8,dt*60));return}
+  e.setFlipX(dx<0);
+  if(!mini&&e.summonCd<=0){e.summonCd=ph2?5:6.5;e.lock=.75;this.act(e,'enemy','attack',true);this.time.delayedCall(300,()=>this.summonMinions(e));return}
+  if(e.specialCd<=0&&dist<620){
+   e.specialCd=(mini?2.8:3.4)*(ph2?.7:1);const token=++e.atk;
+   const slam=mini?Math.random()<.5:(ph2&&Math.random()<.45);
+   if(slam){
+    e.lock=.45;e.setVelocityX(0);this.act(e,'enemy','jump',true);this.floatText(e.x,e.body.y-30,'ระวัง! กระโดดหลบ','#ff8080',16);
+    this.time.delayedCall(400,()=>{if(e.dead||e.atk!==token)return;e.slam=1;e.slamT=this.time.now;e.lock=0;e.setVelocity(Phaser.Math.Clamp(p.x-e.x,-380,380),-560)});
+   }else{
+    e.lock=.4;e.setVelocityX(0);e.chargeDir=dir;this.act(e,'enemy','attack',true);this.floatText(e.x,e.body.y-30,'!!','#ff6060',22);
+    this.time.delayedCall(380,()=>{if(!e.dead&&e.atk===token){e.lock=0;e.charging=.7}});
+   }
+   return;
+  }
+  const spd=ETYPE[e.type].speed*(ph2?1.3:1);
+  if(dist>100){e.setVelocityX(dir*spd);this.act(e,'enemy','run')}
+  else if(e.cd<=0){
+   e.setVelocityX(0);e.cd=ph2?.8:1.05;e.lock=.48;const token=++e.atk;this.act(e,'enemy','attack',true);
+   this.time.delayedCall(200,()=>{if(!e.dead&&e.atk===token&&Math.abs(p.x-e.x)<115&&Math.abs(p.body.bottom-e.body.bottom)<82)this.hurtPlayer(20,dir)});
+  }else{e.setVelocityX(0);this.act(e,'enemy','idle')}
  }
  hurtPlayer(dmg,dir){
   const s=this.ps;if(s.dead||s.inv>0)return;
@@ -580,7 +758,7 @@ class Stage extends Phaser.Scene{
     this.tweens.add({targets:o,angle:f*720,duration:900});
     this.shot(o,{vx:f*430,vy:-380,g:GRAV,life:2,hw:12,hh:10,onEnd:(x,y)=>{
      this.fx('fx_pheekhor_bowl_impact',x,y-10,1.15,f<0);this.cameras.main.shake(120,.007);
-     for(const e of this.hitRect(x-110,y-120,220,160))this.damageEnemy(e,32,Math.sign(e.x-x||f)*220,'fx_hit_heavy',.7);
+     for(const e of this.hitRect(x-110,y-120,220,160))this.damageEnemy(e,32,Math.sign(e.x-x||f)*220,'fx_hit_heavy',.7,true);
     }});
    });
   }else if(id==='soja'){                         // หัวใจ 3 ดอก
@@ -596,7 +774,7 @@ class Stage extends Phaser.Scene{
     if(s.dead)return;const {b,cx}=this.front();
     this.fx('fx_em_chain_arc',cx+f*90,b.y+b.height*.4,1.1,f<0);
     const x=f>0?b.right:b.x-200;
-    for(const e of this.hitRect(x,b.y-30,200,b.height+40))this.damageEnemy(e,34,f*280,'fx_hit_heavy',.75);
+    for(const e of this.hitRect(x,b.y-30,200,b.height+40))this.damageEnemy(e,34,f*280,'fx_hit_heavy',.75,true);
    });
   }else{                                         // วัยรุ่น: พุ่งชนทะลุ (อมตะช่วงพุ่ง)
    s.lock=.3;s.inv=Math.max(s.inv,.35);s.dash={dir:f,t:.22,hit:new Set()};
@@ -615,7 +793,7 @@ class Stage extends Phaser.Scene{
   for(let i=0;i<3;i++)this.time.delayedCall(120+i*140,()=>{
    const x=px+f*(110+i*95);
    this.fx('fx_explosion',x,FLOOR+6,1.05,f<0);this.fx('fx_smoke',x,FLOOR+6,.9,f<0);
-   for(const e of this.hitRect(x-90,FLOOR-160,180,170))this.damageEnemy(e,40,f*320,'fx_hit_heavy',.8);
+   for(const e of this.hitRect(x-90,FLOOR-160,180,170))this.damageEnemy(e,40,f*320,'fx_hit_heavy',.8,true);
   });
  }
 
@@ -627,7 +805,8 @@ class Stage extends Phaser.Scene{
   if(JD(K.R)){this.scene.restart({char:this.charId});return}
   if(JD(K.ONE))this.switchChar('phee');if(JD(K.TWO))this.switchChar('soja');if(JD(K.THREE))this.switchChar('em');if(JD(K.FOUR))this.switchChar('wairoon');
 
-  s.inv=Math.max(0,s.inv-dt);s.lock=Math.max(0,s.lock-dt);s.skillCd=Math.max(0,s.skillCd-dt);
+  s.inv=Math.max(0,s.inv-dt);s.lock=Math.max(0,s.lock-dt);s.skillCd=Math.max(0,s.skillCd-dt);s.buff=Math.max(0,s.buff-dt);
+  if((s.buff>0)!==s.buffOn){s.buffOn=s.buff>0;s.buffOn?p.setTint(0xffe28a):p.clearTint()}
   const ground=p.body.blocked.down||p.body.touching.down;
   s.coyote=ground?.09:Math.max(0,s.coyote-dt);
   s.jumpBuf=pr.jump?.12:Math.max(0,s.jumpBuf-dt);
@@ -636,12 +815,13 @@ class Stage extends Phaser.Scene{
    if(s.dash){
     p.setVelocityX(s.dash.dir*900);s.dash.t-=dt;
     const b=p.body;
-    for(const e of this.hitRect(b.x-14,b.y,b.width+28,b.height))if(!s.dash.hit.has(e)){s.dash.hit.add(e);this.damageEnemy(e,30,s.dash.dir*300,'fx_hit_heavy',.75)}
+    for(const e of this.hitRect(b.x-14,b.y,b.width+28,b.height))if(!s.dash.hit.has(e)){s.dash.hit.add(e);this.damageEnemy(e,30,s.dash.dir*300,'fx_hit_heavy',.75,true)}
     if(s.dash.t<=0){s.dash=null;p.setVelocityX(p.body.velocity.x*.25)}
    }else if(s.lock<=0){
     const L=K.LEFT.isDown||K.A.isDown||touch.left,R=K.RIGHT.isDown||K.D.isDown||touch.right;
-    if(L&&!R){p.setVelocityX(-c.speed);s.face=-1}
-    else if(R&&!L){p.setVelocityX(c.speed);s.face=1}
+    const spd=c.speed*(s.buff>0?1.3:1);
+    if(L&&!R){p.setVelocityX(-spd);s.face=-1}
+    else if(R&&!L){p.setVelocityX(spd);s.face=1}
     else p.setVelocityX(Math.abs(p.body.velocity.x)<8?0:p.body.velocity.x*Math.pow(.68,dt*60));
     if(s.jumpBuf>0&&s.coyote>0){p.setVelocityY(-540);s.jumpBuf=0;s.coyote=0;this.act(p,this.charId,'jump',true)}
     if(pr.shoot)this.shoot();else if(pr.melee)this.melee();else if(pr.skill)this.skill();else if(pr.ult)this.ultimate();
@@ -661,54 +841,45 @@ class Stage extends Phaser.Scene{
   }else if(ground)p.setVelocityX(0);
   s.wasGround=ground;
 
-  // enemies + boss AI
+  // ศัตรู: กระบอง / ยิงไกล / โล่ / มินิบอส / บอส
   for(const e of this.enemies.getChildren()){
    if(e.dead)continue;
    e.cd=Math.max(0,e.cd-dt);e.lock=Math.max(0,e.lock-dt);e.inv=Math.max(0,e.inv-dt);
-   if(e.boss){e.specialCd=Math.max(0,e.specialCd-dt);e.summonCd=Math.max(0,e.summonCd-dt)}
+   if(e.big){e.specialCd=Math.max(0,e.specialCd-dt);e.summonCd=Math.max(0,e.summonCd-dt)}
+   if(e.shieldG)e.shieldG.setPosition(e.x+(e.flipX?-26:26),e.body.y+e.body.height*.5);
    const dx=p.x-e.x,dist=Math.abs(dx),dir=Math.sign(dx)||1;
+   if(s.dead){e.setVelocityX(0);e.charging=0;this.act(e,'enemy','idle');continue}
+   if(e.big){this.bigAI(e,dt,dx,dist,dir);continue}
+   if(e.lock>0){if(e.body.blocked.down)e.setVelocityX(e.body.velocity.x*Math.pow(.82,dt*60));continue}
    e.setFlipX(dx<0);
-   if(s.dead){e.setVelocityX(0);this.act(e,'enemy','idle');continue}
-
-   if(e.boss){
-    if(e.charging>0){
-     e.charging=Math.max(0,e.charging-dt);e.setVelocityX(e.chargeDir*470);this.act(e,'enemy','attack');
-     if(Math.abs(p.x-e.x)<72&&Math.abs(p.body.bottom-e.body.bottom)<80){this.hurtPlayer(26,e.chargeDir);e.charging=0;e.setVelocityX(-e.chargeDir*120)}
-     continue;
+   if(e.type==='gun'){                                   // ยืนห่างๆ แล้วยิง ผู้เล่นเข้าใกล้จะถอย
+    if(dist<230){e.setVelocityX(-dir*85);this.act(e,'enemy','run')}
+    else if(dist>440){e.setVelocityX(dir*110);this.act(e,'enemy','run')}
+    else{e.setVelocityX(0);this.act(e,'enemy','idle')}
+    if(e.cd<=0&&dist<600){
+     e.cd=2.1+Math.random()*.7;e.lock=.6;e.setVelocityX(0);const token=++e.atk;this.act(e,'enemy','shoot',true);
+     this.floatText(e.x,e.body.y-14,'!','#ff5050',20);
+     this.time.delayedCall(330,()=>{if(!e.dead&&e.atk===token)this.enemyShoot(e,Math.sign(this.player.x-e.x)||1)});
     }
-    if(e.lock>0){if(e.body.blocked.down)e.setVelocityX(e.body.velocity.x*Math.pow(.8,dt*60));continue}
-    if(e.summonCd<=0){
-     e.summonCd=6.2;e.lock=.75;this.act(e,'enemy','attack',true);
-     this.time.delayedCall(300,()=>this.summonBossMinions(e));continue;
-    }
-    if(e.specialCd<=0&&dist<560){
-     e.specialCd=3.4;e.lock=.34;e.setVelocityX(0);e.chargeDir=dir;const token=++e.atk;
-     this.act(e,'enemy','attack',true);this.pop('บอสเตรียมพุ่งชน!');
-     this.time.delayedCall(320,()=>{if(!e.dead&&e.atk===token){e.lock=0;e.charging=.72;e.setVelocityX(e.chargeDir*470)}});
-     continue;
-    }
-    if(dist>92){e.setVelocityX(dir*78);this.act(e,'enemy','run')}
-    else if(e.cd<=0){
-     e.setVelocityX(0);e.cd=1.05;e.lock=.48;const token=++e.atk;this.act(e,'enemy','attack',true);
-     this.time.delayedCall(190,()=>{if(!e.dead&&e.atk===token&&Math.abs(p.x-e.x)<105&&Math.abs(p.body.bottom-e.body.bottom)<82)this.hurtPlayer(20,dir)});
-    }else{e.setVelocityX(0);this.act(e,'enemy','idle')}
     continue;
    }
-
-   if(e.lock>0){if(e.body.blocked.down)e.setVelocityX(e.body.velocity.x*Math.pow(.82,dt*60));continue}
-   if(dist>72&&dist<520){e.setVelocityX(dir*95);this.act(e,'enemy','run')}
-   else if(dist<=72&&e.cd<=0){
-    e.setVelocityX(0);e.cd=.9;e.lock=.42;const token=++e.atk;this.act(e,'enemy','attack',true);
-    this.time.delayedCall(180,()=>{if(!e.dead&&e.atk===token&&Math.abs(p.x-e.x)<84&&Math.abs(p.body.bottom-e.body.bottom)<70)this.hurtPlayer(14,dir)});
-   }else{e.setVelocityX(dist<=72?0:e.body.velocity.x*.8);this.act(e,'enemy','idle')}
+   const shield=e.type==='shield',reach=shield?80:72,spd=ETYPE[e.type].speed;
+   if(dist>reach&&dist<640){e.setVelocityX(dir*spd);this.act(e,'enemy','run')}
+   else if(dist<=reach&&e.cd<=0){
+    e.setVelocityX(0);e.cd=shield?1.25:.9;e.lock=.42;const token=++e.atk;this.act(e,'enemy','attack',true);
+    this.time.delayedCall(180,()=>{if(!e.dead&&e.atk===token&&Math.abs(p.x-e.x)<reach+12&&Math.abs(p.body.bottom-e.body.bottom)<70)this.hurtPlayer(shield?18:14,dir)});
+   }else{e.setVelocityX(dist<=reach?0:e.body.velocity.x*.8);this.act(e,'enemy','idle')}
   }
 
+  // ไอเทมบนพื้น: กะพริบก่อนหาย
+  for(const it of this.items.getChildren()){const age=this.time.now-it.born;if(age>11000)it.destroy();else if(age>8500)it.setAlpha(Math.floor(age/120)%2?.3:1)}
+  this.updateEnemyShots(dt);
   this.updateShots(dt);
   this.updateEncounter();
 
   // parallax
   const sx=this.cameras.main.scrollX;
-  for(const l of this.bg)l.tilePositionX=Math.round(sx*l.sp)/l.tileScaleX;
+  for(const l of this.bg){const o=sx*l.sp,k0=Math.floor(o/l.tw);l.imgs.forEach((im,j)=>{const idx=k0+j;im.x=Math.round(idx*l.tw-o);im.setFlipX((idx&1)===1)})}
 
   this.drawHud();
  }
@@ -724,8 +895,12 @@ class Stage extends Phaser.Scene{
    g.fillStyle(0x0b0d12,.8).fillRect(56,90,150,12);g.fillStyle(s.ult>=100?0xffd43b:0x8a6420).fillRect(58,92,146*s.ult/100,8);
   }
   this.setT(this.tName,`${CHARS[this.charId].name}  ${s.hp}/${s.maxHp}`);
-  const stageInfo=this.boss&&!this.boss.dead?`  👹 BOSS ${this.boss.hp}/${this.boss.maxHp}`:`  🌊 ${Math.min(this.waveIndex+1,3)}/3`;
-  this.setT(this.tStats,`🪙 ${this.coins}   ☠ ${this.kills}/${this.total}${stageInfo}`);
+  const enc=this.encActive?this.encIdx:this.encNext;
+  this.setT(this.tStats,`🪙 ${this.coins}   ☠ ${this.kills}   📍 ${Math.min(enc+1,STAGE.length)}/${STAGE.length}`);
+  this.setT(this.tBuff,s.buff>0?`⚡ ${Math.ceil(s.buff)}`:'');
+  const bf=this.bigFoe&&!this.bigFoe.dead?this.bigFoe:null;
+  if(bf){g.fillStyle(0x0b0d12,.9).fillRect(W/2-210,80,420,14);g.fillStyle(bf.phase===2?0xff2020:0xff7a30).fillRect(W/2-208,82,416*bf.hp/bf.maxHp,10);this.hudKey=''}
+  this.tBoss.setVisible(!!bf);
   // หลอดเลือดศัตรู / บอส
   const eb=this.ebars;eb.clear();
   for(const e of this.enemies.getChildren())if(!e.dead&&Math.abs(e.x-this.player.x)<520){
