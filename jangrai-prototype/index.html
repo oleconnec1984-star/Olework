@@ -116,10 +116,10 @@ html,body{margin:0;height:100%;background:#07090d;color:#fff;font-family:system-
 <div id="controls">
  <div class="group dpad"><button class="ctrl" data-key="left" aria-label="ซ้าย">◀</button><button class="ctrl" data-key="right" aria-label="ขวา">▶</button><button class="ctrl" data-key="down" aria-label="หมอบ">▼</button></div>
  <div class="group pad">
-  <button class="ctrl action" data-key="shoot" style="grid-area:shoot">ยิง<br>J</button>
-  <button class="ctrl action" id="skill" data-key="skill" style="grid-area:skill">SKILL<br>L</button>
-  <button class="ctrl action" id="ult" data-key="ult" style="grid-area:ult">ULT<br>I</button>
-  <button class="ctrl action" data-key="melee" style="grid-area:melee">ตี<br>K</button>
+  <button class="ctrl action" data-key="shoot" style="grid-area:shoot">ยิง<br>A</button>
+  <button class="ctrl action" id="skill" data-key="skill" style="grid-area:skill">SKILL<br>D</button>
+  <button class="ctrl action" id="ult" data-key="ult" style="grid-area:ult">ULT<br>Q</button>
+  <button class="ctrl action" data-key="melee" style="grid-area:melee">ตี<br>S</button>
   <button class="ctrl jumpbtn" data-key="jump" style="grid-area:jump" aria-label="กระโดด">▲<small>โดด</small></button>
  </div>
 </div>
@@ -140,7 +140,7 @@ html,body{margin:0;height:100%;background:#07090d;color:#fff;font-family:system-
  <div class="sel-foot">
   <div class="sel-tiles" id="selTiles"></div>
   <button id="start" type="button" disabled>LOADING…</button>
-  <div class="sel-help">← → เลือก • Enter ยืนยัน • มือถือ: แตะรูปแล้วกดยืนยัน (หมุนจอแนวนอน)</div>
+  <div class="sel-help">← → เลือก • Enter ยืนยัน • ในเกม: ← → เดิน ↑/W โดด ↓ หมอบ • A ยิง S ตี D สกิล Q อัลติ • มือถือ: แตะรูปแล้วกดยืนยัน (หมุนจอแนวนอน)</div>
  </div>
  <div id="selBand"><span id="selBandTxt">READY? FIGHT!</span></div>
  <div id="selFlash"></div>
@@ -429,7 +429,7 @@ class Stage extends Phaser.Scene{
   cam.setFollowOffset(-W*.12,0);
 
   /* input */
-  this.keys=this.input.keyboard.addKeys('LEFT,RIGHT,UP,DOWN,S,A,D,W,SPACE,J,K,L,I,Z,X,C,V,R,ONE,TWO,THREE,FOUR');
+  this.keys=this.input.keyboard.addKeys('LEFT,RIGHT,UP,DOWN,S,A,D,W,Q,E,SPACE,J,K,L,I,Z,X,C,V,R,ONE,TWO,THREE,FOUR');
 
   /* HUD */
   const st=(s,c='#fff')=>({fontFamily:'system-ui,sans-serif',fontSize:s,fontStyle:'bold',color:c,stroke:'#000',strokeThickness:3});
@@ -936,7 +936,8 @@ class Stage extends Phaser.Scene{
   if(this.hs){this.drawHud();return}
   const dt=Math.min(delta/1000,.05),p=this.player,s=this.ps,c=CHARS[this.charId],K=this.keys,JD=Phaser.Input.Keyboard.JustDown;
   // อ่านปุ่มทุกเฟรม (ต้องเรียก JustDown ทุกเฟรม ไม่งั้นค้าง)
-  const pr={jump:JD(K.SPACE)|JD(K.UP)|JD(K.W)|tap('jump'),shoot:JD(K.J)|JD(K.Z)|tap('shoot'),melee:JD(K.K)|JD(K.X)|tap('melee'),skill:JD(K.L)|JD(K.C)|tap('skill'),ult:JD(K.I)|JD(K.V)|tap('ult')};
+  // มือขวา: ลูกศร เดิน/↑กระโดด/↓หมอบ • มือซ้าย: W กระโดด A ยิง S ตี D สกิล Q อัลติ (J K L I ยังใช้ได้)
+  const pr={jump:JD(K.SPACE)|JD(K.UP)|JD(K.W)|tap('jump'),shoot:JD(K.A)|JD(K.J)|tap('shoot'),melee:JD(K.S)|JD(K.K)|tap('melee'),skill:JD(K.D)|JD(K.L)|tap('skill'),ult:JD(K.Q)|JD(K.E)|JD(K.I)|tap('ult')};
   if(JD(K.R)){this.scene.restart({char:this.charId});return}
   if(JD(K.ONE))this.switchChar('phee');if(JD(K.TWO))this.switchChar('soja');if(JD(K.THREE))this.switchChar('em');if(JD(K.FOUR))this.switchChar('wairoon');
 
@@ -946,7 +947,7 @@ class Stage extends Phaser.Scene{
   s.coyote=ground?.09:Math.max(0,s.coyote-dt);
   s.jumpBuf=pr.jump?.12:Math.max(0,s.jumpBuf-dt);
   // หมอบ: กด ↓/S หรือปุ่ม ▼ ตอนอยู่บนพื้น ตัวเตี้ยลง กระสุนศัตรูลอยผ่านหัว
-  const DN=K.DOWN.isDown||K.S.isDown||touch.down;
+  const DN=K.DOWN.isDown||touch.down;
   const wantC=!s.dead&&!s.dash&&ground&&DN&&(s.lock<=0||s.crouch);
   if(wantC!==!!s.crouch){s.crouch=wantC;this.fitBody(p,this.charId,108,45,wantC?36:80)}
 
@@ -957,7 +958,7 @@ class Stage extends Phaser.Scene{
     for(const e of this.hitRect(b.x-14,b.y,b.width+28,b.height))if(!s.dash.hit.has(e)){s.dash.hit.add(e);this.damageEnemy(e,30,s.dash.dir*300,'fx_hit_heavy',.75,true)}
     if(s.dash.t<=0){s.dash=null;p.setVelocityX(p.body.velocity.x*.25)}
    }else if(s.lock<=0){
-    const L=K.LEFT.isDown||K.A.isDown||touch.left,R=K.RIGHT.isDown||K.D.isDown||touch.right;
+    const L=K.LEFT.isDown||touch.left,R=K.RIGHT.isDown||touch.right;
     const spd=c.speed*(s.buff>0?1.3:1);
     if(s.crouch){p.setVelocityX(0);if(L&&!R)s.face=-1;else if(R&&!L)s.face=1}
     else if(L&&!R){p.setVelocityX(-spd);s.face=-1}
